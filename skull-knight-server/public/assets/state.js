@@ -1,0 +1,15 @@
+export const state = {
+  page: 1,
+  pageSize: 12,
+  searchTerm: "",
+  sort: "stable",
+  filterStatus: "all",
+  filterOs: "all",
+  filterCountry: "all",
+  filterGroup: "all",
+  lastDigest: "",
+  isLoading: false,
+  pendingForce: false,
+  pendingReorder: false,
+  thumbnailsRequested: false,
+};

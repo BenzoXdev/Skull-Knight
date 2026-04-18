@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purgatory - Skull Knight</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="stylesheet" href="/assets/tailwind.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/assets/main.css" />
+    <link rel="stylesheet" href="/assets/custom.css" />
+    <script defer src="/assets/toast.js"></script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <header id="top-nav"></header>
+
+    <div class="min-h-full flex flex-col">
+      <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-100 mb-1">
+              <i class="fa-solid fa-user-clock text-amber-400 mr-2"></i>Purgatory
+            </h2>
+            <p class="text-slate-400 text-sm">
+              Approve or deny clients before they can connect to the server.
+            </p>
+          </div>
+          <div class="flex items-center gap-4">
+            <div id="stats-bar" class="flex items-center gap-3 text-sm">
+              <span class="text-amber-400"><i class="fa-solid fa-clock mr-1"></i><span id="stat-pending">0</span> pending</span>
+              <span class="text-emerald-400"><i class="fa-solid fa-check mr-1"></i><span id="stat-approved">0</span> approved</span>
+              <span class="text-red-400"><i class="fa-solid fa-ban mr-1"></i><span id="stat-denied">0</span> denied</span>
+              <span class="text-rose-400"><i class="fa-solid fa-shield-halved mr-1"></i><span id="stat-banned-ips">0</span> banned IPs</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="mb-4 flex items-center gap-2 flex-wrap">
+          <button data-filter="pending"
+            class="enrollment-tab px-4 py-2 rounded-lg text-sm font-medium bg-amber-500/20 text-amber-300 border border-amber-500/40">
+            Pending
+          </button>
+          <button data-filter="denied"
+            class="enrollment-tab px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700">
+            Denied
+          </button>
+          <button data-filter="approved"
+            class="enrollment-tab px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700">
+            Approved
+          </button>
+          <button data-filter="banned-ips"
+            class="enrollment-tab px-4 py-2 rounded-lg text-sm font-medium bg-slate-800 text-slate-400 border border-slate-700 hover:bg-slate-700">
+            <i class="fa-solid fa-shield-halved mr-1"></i>Banned IPs
+          </button>
+          <div class="flex-1"></div>
+          <div class="relative">
+            <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm pointer-events-none"></i>
+            <input type="text" id="search-input" placeholder="Search host, user, IP..."
+              class="w-56 pl-9 pr-3 py-2 rounded-lg text-sm bg-slate-800 border border-slate-700 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent" />
+          </div>
+          <button id="bulk-approve-btn"
+            class="hidden px-3 py-2 rounded-lg text-sm font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition-colors">
+            <i class="fa-solid fa-check mr-1"></i>Approve Selected
+          </button>
+          <button id="bulk-deny-btn"
+            class="hidden px-3 py-2 rounded-lg text-sm font-medium bg-red-600 hover:bg-red-700 text-white transition-colors">
+            <i class="fa-solid fa-ban mr-1"></i>Deny Selected
+          </button>
+          <button id="bulk-ban-btn"
+            class="hidden px-3 py-2 rounded-lg text-sm font-medium bg-rose-700 hover:bg-rose-800 text-white transition-colors">
+            <i class="fa-solid fa-shield-halved mr-1"></i>Ban Selected IPs
+          </button>
+        </div>
+
+        <!-- Clients Table -->
+        <div class="bg-slate-900/50 border border-slate-800 rounded-xl overflow-x-auto">
+          <table class="w-full min-w-[1200px]" id="enrollment-table">
+            <thead class="bg-slate-800/50 border-b border-slate-700">
+              <tr>
+                <th class="w-10 px-4 py-3">
+                  <input type="checkbox" id="select-all" class="h-4 w-4 rounded border-slate-600" />
+                </th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-300">Host</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-300">User</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-300">OS</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-300">CPU</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-300">GPU</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-300">RAM</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-300">IP</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-300">Country</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-300">Key Fingerprint</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-300">Last Seen</th>
+                <th class="text-left px-4 py-3 text-sm font-semibold text-slate-300">Status</th>
+                <th class="text-right px-4 py-3 text-sm font-semibold text-slate-300">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="enrollment-body" class="divide-y divide-slate-800">
+              <tr id="enrollment-loading">
+                <td colspan="13" class="px-6 py-12 text-center text-slate-500">
+                  <i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <div id="enrollment-empty" class="hidden px-6 py-12 text-center text-slate-500">
+            <i class="fa-solid fa-inbox text-3xl mb-3 block"></i>
+            <p>No clients in this category.</p>
+          </div>
+        </div>
+
+        <!-- Banned IPs Table (hidden by default, shown on Banned IPs tab) -->
+        <div id="banned-ips-section" class="hidden">
+          <div class="mb-4 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-slate-100">
+              <i class="fa-solid fa-shield-halved text-rose-400 mr-2"></i>Banned IPs
+            </h3>
+            <button id="add-ban-btn"
+              class="px-3 py-2 rounded-lg text-sm font-medium bg-red-600 hover:bg-red-700 text-white transition-colors">
+              <i class="fa-solid fa-plus mr-1"></i>Ban IP
+            </button>
+          </div>
+          <!-- Manual ban form (hidden by default) -->
+          <div id="manual-ban-form" class="hidden mb-4 bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+            <div class="flex items-end gap-3">
+              <div class="flex-1">
+                <label class="block text-sm font-medium text-slate-300 mb-1">IP Address</label>
+                <input type="text" id="ban-ip-input" placeholder="e.g. 192.168.1.100"
+                  class="w-full px-3 py-2 rounded-lg text-sm bg-slate-800 border border-slate-700 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+              </div>
+              <div class="flex-1">
+                <label class="block text-sm font-medium text-slate-300 mb-1">Reason (optional)</label>
+                <input type="text" id="ban-reason-input" placeholder="Reason for ban"
+                  class="w-full px-3 py-2 rounded-lg text-sm bg-slate-800 border border-slate-700 text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" />
+              </div>
+              <button id="confirm-ban-btn"
+                class="px-4 py-2 rounded-lg text-sm font-medium bg-red-600 hover:bg-red-700 text-white transition-colors">
+                Ban
+              </button>
+              <button id="cancel-ban-btn"
+                class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-700 hover:bg-slate-600 text-white transition-colors">
+                Cancel
+              </button>
+            </div>
+          </div>
+          <div class="bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden">
+            <table class="w-full">
+              <thead class="bg-slate-800/50 border-b border-slate-700">
+                <tr>
+                  <th class="text-left px-4 py-3 text-sm font-semibold text-slate-300">IP Address</th>
+                  <th class="text-left px-4 py-3 text-sm font-semibold text-slate-300">Reason</th>
+                  <th class="text-left px-4 py-3 text-sm font-semibold text-slate-300">Banned At</th>
+                  <th class="text-right px-4 py-3 text-sm font-semibold text-slate-300">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="banned-ips-body" class="divide-y divide-slate-800"></tbody>
+            </table>
+            <div id="banned-ips-empty" class="hidden px-6 py-12 text-center text-slate-500">
+              <i class="fa-solid fa-shield-halved text-3xl mb-3 block"></i>
+              <p>No banned IPs.</p>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Ban Confirmation Modal -->
+    <div id="ban-confirm-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center">
+      <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" id="ban-modal-backdrop"></div>
+      <div class="relative bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="flex-shrink-0 w-12 h-12 rounded-full bg-rose-500/20 flex items-center justify-center">
+            <i class="fa-solid fa-shield-halved text-rose-400 text-xl"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-slate-100">Confirm IP Ban</h3>
+            <p class="text-sm text-slate-400">This action cannot be easily undone.</p>
+          </div>
+        </div>
+        <div id="ban-modal-body" class="mb-5 text-sm text-slate-300">
+          <!-- Filled dynamically -->
+        </div>
+        <div class="flex items-center justify-end gap-3">
+          <button id="ban-modal-cancel"
+            class="px-4 py-2 rounded-lg text-sm font-medium bg-slate-700 hover:bg-slate-600 text-white transition-colors">
+            Cancel
+          </button>
+          <button id="ban-modal-confirm"
+            class="px-4 py-2 rounded-lg text-sm font-medium bg-rose-600 hover:bg-rose-700 text-white transition-colors">
+            <i class="fa-solid fa-shield-halved mr-1"></i>Ban
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/assets/nav.js"></script>
+    <script type="module" src="/assets/purgatory-ui.js"></script>
+  </body>
+</html>

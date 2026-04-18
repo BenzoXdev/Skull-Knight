@@ -1,0 +1,32 @@
+================================================================================
+  SKULL KNIGHT DESKTOP — PLEASE READ BEFORE USING
+================================================================================
+
+This application is a DESKTOP CLIENT ONLY. It does NOT include the server.
+
+If you launch Skull Knight Desktop without a running Skull Knight server, it will
+show a connection error and nothing will work. That is expected.
+
+--------------------------------------------------------------------------------
+  WHAT YOU NEED TO DO
+--------------------------------------------------------------------------------
+
+1. Set up and start the Skull Knight server FIRST.
+   The server is a separate component that you must deploy yourself.
+
+2. Full setup instructions are in the README:
+   https://github.com/benzoXdev/Skull-Knight/blob/main/README.md
+
+3. Once the server is running, open this desktop client and enter the
+   server's IP address (or hostname) and port on the connection screen.
+
+--------------------------------------------------------------------------------
+  QUICK SUMMARY
+--------------------------------------------------------------------------------
+
+  Skull Knight Desktop  →  connects TO a server
+  Skull Knight Server   →  must be running BEFORE you connect
+
+Without the server, this client is useless.
+
+================================================================================

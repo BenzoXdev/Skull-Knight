@@ -1,0 +1,50 @@
+{
+  "name": "skull-knight-desktop",
+  "version": "1.0.1",
+  "description": "Skull Knight Desktop Client - Fat client for the Skull Knight server",
+  "author": "benzoXdev",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win nsis",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron": "^35.0.0",
+    "electron-builder": "^26.0.0"
+  },
+  "build": {
+    "appId": "com.skull-knight.desktop",
+    "productName": "Skull Knight",
+    "icon": "build/icon.ico",
+    "files": [
+      "src/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Skull Knight",
+      "menuCategory": false,
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "include": "build/installer.nsh",
+      "artifactName": "Skull Knight Setup.${ext}"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "build/icon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "build/icon.ico"
+    }
+  }
+}

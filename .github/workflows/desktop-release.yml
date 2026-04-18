@@ -1,0 +1,81 @@
+name: Skull Knight Desktop Windows Release
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "skull-knight-Desktop/**"
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    defaults:
+      run:
+        working-directory: skull-knight-Desktop
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Get Version
+        run: |
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          echo "VERSION=$version" >> $env:GITHUB_ENV
+        shell: pwsh
+
+      - name: Build Windows Installer
+        run: npm run build:win
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: skull-knight-desktop-${{ env.VERSION }}
+          path: skull-knight-Desktop/dist/Skull Knight Setup.exe
+
+      - name: Delete Existing Release and Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Look up the release by tag_name via the list endpoint (works even if the git tag is gone)
+          RELEASE_ID=$(gh api /repos/${{ github.repository }}/releases \
+            --jq '.[] | select(.tag_name == "skull-knight-Desktop-v${{ env.VERSION }}") | .id' \
+            2>/dev/null || true)
+          if [ -n "$RELEASE_ID" ]; then
+            gh api --method DELETE /repos/${{ github.repository }}/releases/$RELEASE_ID || true
+          fi
+          # Delete the git tag ref if it somehow still exists
+          gh api --method DELETE /repos/${{ github.repository }}/git/refs/tags/skull-knight-Desktop-v${{ env.VERSION }} 2>/dev/null || true
+        shell: bash
+
+      - name: Create and Push Tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -f skull-knight-Desktop-v${{ env.VERSION }}
+          git push origin skull-knight-Desktop-v${{ env.VERSION }} --force
+        shell: bash
+
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create skull-knight-Desktop-v${{ env.VERSION }} "dist/Skull Knight Setup.exe" "PLEASE_READ.txt" \
+            --verify-tag \
+            -t "Skull Knight Desktop v${{ env.VERSION }}" \
+            -n "Automated build release for Skull Knight Desktop v${{ env.VERSION }}" \
+            --draft=false \
+            --prerelease=false
+        shell: bash

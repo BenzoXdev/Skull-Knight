@@ -1,0 +1,182 @@
+/* ============================================================
+   Skull Knight — Crimson Red Theme
+   Paste into Settings → Custom CSS (replaces previous version)
+   ============================================================ */
+
+/* ── 1. CSS Variables ─────────────────────────────────────── */
+:root {
+  --color-sky-50:#fff1f2;  --color-sky-100:#ffe4e6;  --color-sky-200:#fecdd3;
+  --color-sky-300:#fda4af; --color-sky-400:#fb7185;  --color-sky-500:#f43f5e;
+  --color-sky-600:#e11d48; --color-sky-700:#be123c;  --color-sky-800:#9f1239;
+  --color-sky-900:#881337; --color-sky-950:#4c0519;
+
+  --color-indigo-50:#fff1f2;  --color-indigo-100:#ffe4e6;  --color-indigo-200:#fecdd3;
+  --color-indigo-300:#fda4af; --color-indigo-400:#fb7185;  --color-indigo-500:#f43f5e;
+  --color-indigo-600:#e11d48; --color-indigo-700:#be123c;  --color-indigo-800:#9f1239;
+  --color-indigo-900:#881337; --color-indigo-950:#4c0519;
+
+  --color-violet-50:#fff1f2;  --color-violet-100:#ffe4e6;  --color-violet-200:#fecdd3;
+  --color-violet-300:#fda4af; --color-violet-400:#fb7185;  --color-violet-500:#f43f5e;
+  --color-violet-600:#e11d48; --color-violet-700:#be123c;  --color-violet-800:#9f1239;
+  --color-violet-900:#881337; --color-violet-950:#4c0519;
+
+  --color-blue-50:#fff1f2;  --color-blue-100:#ffe4e6;  --color-blue-200:#fecdd3;
+  --color-blue-300:#fda4af; --color-blue-400:#fb7185;  --color-blue-500:#f43f5e;
+  --color-blue-600:#e11d48; --color-blue-700:#be123c;  --color-blue-800:#9f1239;
+  --color-blue-900:#881337; --color-blue-950:#4c0519;
+
+  --color-cyan-50:#fff1f2;  --color-cyan-100:#ffe4e6;  --color-cyan-200:#fecdd3;
+  --color-cyan-300:#fda4af; --color-cyan-400:#fb7185;  --color-cyan-500:#f43f5e;
+  --color-cyan-600:#e11d48; --color-cyan-700:#be123c;  --color-cyan-800:#9f1239;
+  --color-cyan-900:#881337; --color-cyan-950:#4c0519;
+
+  /* UI system vars (used by input focus rings, card hovers, etc.) */
+  --ui-border-strong: rgba(225, 29, 72, 0.4);
+  --ui-ring:          rgba(225, 29, 72, 0.28);
+}
+
+/* ── 2. Page Background ───────────────────────────────────── */
+body {
+  background:
+    radial-gradient(120% 120% at 20% 20%, #2a0010 0%, transparent 45%),
+    radial-gradient(110% 110% at 80%  0%, #1a0008 0%, transparent 50%),
+    #08030a !important;
+}
+
+/* ── 3. App Loader / Splash Screen ───────────────────────── */
+.app-loader-bg {
+  background:
+    radial-gradient(60%  50%  at 20%  20%, rgba(225,29,72,0.22), transparent 70%),
+    radial-gradient(50%  45%  at 80%  10%, rgba(159,18,57,0.20), transparent 72%),
+    radial-gradient(65%  55%  at 50% 100%, rgba(127, 7,31,0.12), transparent 75%) !important;
+}
+.app-loader-core {
+  border-color: rgba(225, 29, 72, 0.3) !important;
+  box-shadow: 0 20px 46px rgba(0,0,0,0.5), 0 0 0 1px rgba(251,113,133,0.1) !important;
+}
+.app-loader-core::before {
+  background: linear-gradient(110deg, transparent 20%, rgba(251,113,133,0.14) 50%, transparent 80%) !important;
+}
+.ring-a { border-top-color: rgba(251,113,133,0.95) !important; border-right-color: rgba(225,29,72,0.65) !important; }
+.ring-b { border-left-color: rgba(251,113,133,0.90) !important; border-bottom-color: rgba(225,29,72,0.60) !important; }
+.ring-c { border-top-color: rgba(255,205,211,0.95)  !important; border-right-color:  rgba(251,113,133,0.70) !important; }
+.loader-title   { text-shadow: 0 0 18px rgba(225,29,72,0.3) !important; }
+.loader-percent { color: #fda4af !important; }
+.loader-track   { border-color: rgba(225,29,72,0.22) !important; }
+.loader-bar {
+  background: linear-gradient(90deg, rgba(251,113,133,0.9), rgba(225,29,72,0.95)) !important;
+  box-shadow: 0 0 14px rgba(225,29,72,0.38) !important;
+}
+
+/* ── 4. Top Nav Bar ───────────────────────────────────────── */
+#top-nav nav a:hover {
+  border-color: rgba(225, 29, 72, 0.45) !important;
+}
+#top-nav nav a.nav-active {
+  border-color: rgba(225, 29, 72, 0.62) !important;
+  background: linear-gradient(135deg, rgba(127,7,31,0.45), rgba(30,10,20,0.9)) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(251,113,133,0.18),
+    0 10px 26px rgba(159,18,57,0.24) !important;
+}
+#top-nav nav a.nav-active i {
+  filter: drop-shadow(0 0 10px rgba(251,113,133,0.45)) !important;
+}
+
+/* ── 5. Client Count Pill ─────────────────────────────────── */
+#total-pill {
+  background: linear-gradient(135deg, rgba(127,7,31,0.55), rgba(20,5,10,0.75)) !important;
+  border-color: rgba(225, 29, 72, 0.5) !important;
+  box-shadow: 0 8px 20px rgba(159,18,57,0.25) !important;
+}
+
+/* ── 6. Filter / Search Focus Glows ──────────────────────── */
+#filter-status:focus, #filter-os:focus, #sort:focus {
+  border-color: rgba(225, 29, 72, 0.65) !important;
+  box-shadow:   0 0 0 3px rgba(225, 29, 72, 0.18) !important;
+}
+#search-shell:focus-within {
+  border-color: rgba(225, 29, 72, 0.65) !important;
+  box-shadow:   0 0 0 3px rgba(225, 29, 72, 0.18) !important;
+}
+
+/* ── 7. Pagination / Selection Button Hover ───────────────── */
+#select-all:hover, #clear-selection:hover, #prev:hover, #next:hover {
+  border-color: rgba(225, 29, 72, 0.45) !important;
+}
+
+/* ── 8. Bulk Action Toolbar ───────────────────────────────── */
+#bulk-toolbar {
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(225,29,72,0.15), transparent 55%),
+    rgba(127, 7, 31, 0.3) !important;
+  border-color: rgba(225, 29, 72, 0.45) !important;
+}
+
+/* ── 9. Client Card Hover ─────────────────────────────────── */
+#grid article.card:hover {
+  border-color: rgba(225, 29, 72, 0.45) !important;
+  box-shadow:
+    0 18px 36px rgba(2,6,23,0.45),
+    0 0 0 1px rgba(225,29,72,0.14) !important;
+}
+
+/* ── 10. Primary Button ───────────────────────────────────── */
+.button.primary {
+  background: linear-gradient(120deg, #be123c, #e11d48) !important;
+  border-color: rgba(251, 113, 133, 0.55) !important;
+  box-shadow: 0 10px 24px rgba(159,18,57,0.35), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+}
+.button.primary:hover {
+  box-shadow: 0 6px 24px rgba(225,29,72,0.45), inset 0 1px 0 rgba(255,255,255,0.2) !important;
+}
+
+/* ── 11. Input / Form Focus ───────────────────────────────── */
+.input-row:focus-within {
+  border-color: rgba(225, 29, 72, 0.5) !important;
+  box-shadow:   0 0 0 3px rgba(225, 29, 72, 0.1) !important;
+}
+.input-row:focus-within i { color: #e11d48 !important; }
+
+/* ── 12. Admin Crown Icon ─────────────────────────────────── */
+.header-crown {
+  background: linear-gradient(135deg, #fb7185, #e11d48) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* ── 13. Login Click Particles ────────────────────────────── */
+.login-btn-particle {
+  background: radial-gradient(circle, rgba(251,113,133,1), rgba(225,29,72,0.9)) !important;
+  box-shadow:
+    0 0  6px rgba(225,29,72,1.0),
+    0 0 12px rgba(225,29,72,0.9),
+    0 0 24px rgba(225,29,72,0.7),
+    0 0 36px rgba(159,18,57,0.5) !important;
+}
+
+/* ── 14. Console ──────────────────────────────────────────── */
+.console-output {
+  background:
+    radial-gradient(120% 120% at 20%  20%, rgba(225,29,72,0.08), transparent 50%),
+    radial-gradient( 80%  80% at 80%   0%, rgba(159,18,57,0.08), transparent 60%),
+    #0b0208 !important;
+}
+.console-body {
+  background:
+    radial-gradient(120% 120% at 20% 20%, #2d0a14 0%, transparent 45%),
+    radial-gradient(110% 110% at 80%  0%, #1a0810 0%, transparent 50%),
+    #08030a !important;
+}
+
+/* ── 15. Table Row Hover ──────────────────────────────────── */
+tbody tr:hover { background: rgba(127, 7, 31, 0.2) !important; }
+
+/* ── 16. Scrollbar ────────────────────────────────────────── */
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(225,29,72,0.76), rgba(159,18,57,0.7)) !important;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(251,113,133,0.88), rgba(225,29,72,0.84)) !important;
+}

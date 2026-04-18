@@ -1,0 +1,663 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Client Builder - Skull Knight</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/assets/tailwind.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="stylesheet" href="/assets/main.css" />
+    <link rel="stylesheet" href="/assets/custom.css" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script defer src="/assets/toast.js"></script>
+    <script defer src="/assets/ripple.js"></script>
+    <style>
+      .accordion-body {
+        display: grid;
+        grid-template-rows: 1fr;
+        transition: grid-template-rows 0.2s ease, opacity 0.2s ease;
+        opacity: 1;
+      }
+      .accordion-body.collapsed {
+        grid-template-rows: 0fr;
+        opacity: 0;
+      }
+      .accordion-body > .accordion-inner {
+        overflow: hidden;
+      }
+      .accordion-chevron {
+        transition: transform 0.2s ease;
+      }
+      .accordion-chevron.rotated {
+        transform: rotate(-180deg);
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <header id="top-nav"></header>
+    <main class="px-5 py-6">
+      <div class="max-w-6xl mx-auto flex flex-col gap-5">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <h1 class="text-2xl font-semibold">Client Builder</h1>
+            <p class="text-slate-400">Build customized Skull Knight client agents</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <!-- Build Configuration -->
+          <div class="bg-slate-900/70 border border-slate-800 rounded-lg p-5">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-gear"></i> Build Configuration
+            </h2>
+
+            <form id="build-form" class="flex flex-col gap-3">
+
+              <!-- == Section 1: Target Platforms (open) == -->
+              <div class="accordion-section border border-slate-800 rounded-lg overflow-hidden" data-open="true">
+                <button type="button" class="accordion-header w-full flex items-center justify-between px-4 py-3 bg-slate-800/50 hover:bg-slate-800/80 transition-colors text-left">
+                  <span class="flex items-center gap-2 text-sm font-medium text-slate-200">
+                    <i class="fa-solid fa-display text-slate-400"></i> Target Platforms
+                  </span>
+                  <i class="fa-solid fa-chevron-down accordion-chevron text-slate-400 text-xs"></i>
+                </button>
+                <div class="accordion-body">
+                  <div class="accordion-inner px-4 pb-4 pt-3">
+                    <div class="grid grid-cols-2 gap-2">
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                        <input type="checkbox" name="platform" value="windows-amd64" class="w-4 h-4" checked />
+                        <span><i class="fa-brands fa-windows text-blue-400"></i> Windows x64</span>
+                      </label>
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                        <input type="checkbox" name="platform" value="windows-386" class="w-4 h-4" />
+                        <span><i class="fa-brands fa-windows text-blue-400"></i> Windows x86</span>
+                      </label>
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-blue-500 transition-colors">
+                        <input type="checkbox" name="platform" value="windows-arm64" class="w-4 h-4" />
+                        <span><i class="fa-brands fa-windows text-blue-400"></i> Windows ARM64</span>
+                      </label>
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-orange-500 transition-colors">
+                        <input type="checkbox" name="platform" value="linux-amd64" class="w-4 h-4" />
+                        <span><i class="fa-brands fa-linux text-amber-400"></i> Linux x64</span>
+                      </label>
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-orange-500 transition-colors">
+                        <input type="checkbox" name="platform" value="linux-arm64" class="w-4 h-4" />
+                        <span><i class="fa-brands fa-linux text-amber-400"></i> Linux ARM64</span>
+                      </label>
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-orange-500 transition-colors">
+                        <input type="checkbox" name="platform" value="linux-armv7" class="w-4 h-4" />
+                        <span><i class="fa-brands fa-linux text-amber-400"></i> Linux ARMv7</span>
+                      </label>
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-white transition-colors">
+                        <input type="checkbox" name="platform" value="darwin-amd64" class="w-4 h-4" />
+                        <span><i class="fa-brands fa-apple text-slate-200"></i> macOS x64</span>
+                      </label>
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-white transition-colors">
+                        <input type="checkbox" name="platform" value="darwin-arm64" class="w-4 h-4" />
+                        <span><i class="fa-brands fa-apple text-slate-200"></i> macOS ARM64</span>
+                      </label>
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-sky-500 transition-colors">
+                        <input type="checkbox" name="platform" value="freebsd-amd64" class="w-4 h-4" />
+                        <span><i class="fa-brands fa-linux text-cyan-300"></i> FreeBSD x64</span>
+                      </label>
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-sky-500 transition-colors">
+                        <input type="checkbox" name="platform" value="freebsd-arm64" class="w-4 h-4" />
+                        <span><i class="fa-brands fa-linux text-cyan-300"></i> FreeBSD ARM64</span>
+                      </label>
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-green-500 transition-colors">
+                        <input type="checkbox" name="platform" value="android-arm64" class="w-4 h-4" />
+                        <span><i class="fa-brands fa-android text-green-400"></i> Android ARM64</span>
+                      </label>
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-green-500 transition-colors">
+                        <input type="checkbox" name="platform" value="android-amd64" class="w-4 h-4" />
+                        <span><i class="fa-brands fa-android text-green-400"></i> Android x64</span>
+                      </label>
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-green-500 transition-colors">
+                        <input type="checkbox" name="platform" value="android-armv7" class="w-4 h-4" />
+                        <span><i class="fa-brands fa-android text-green-400"></i> Android ARMv7</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- == Section 2: Connection & Identity (open) == -->
+              <div class="accordion-section border border-slate-800 rounded-lg overflow-hidden" data-open="true">
+                <button type="button" class="accordion-header w-full flex items-center justify-between px-4 py-3 bg-slate-800/50 hover:bg-slate-800/80 transition-colors text-left">
+                  <span class="flex items-center gap-2 text-sm font-medium text-slate-200">
+                    <i class="fa-solid fa-plug text-slate-400"></i> Connection &amp; Identity
+                  </span>
+                  <i class="fa-solid fa-chevron-down accordion-chevron text-slate-400 text-xs"></i>
+                </button>
+                <div class="accordion-body">
+                  <div class="accordion-inner px-4 pb-4 pt-3 flex flex-col gap-4">
+
+                    <div>
+                      <label class="block text-sm font-medium text-slate-300 mb-2" for="server-url">Server URL</label>
+                      <input type="text" id="server-url" name="server-url" placeholder="your-server:5173"
+                        class="w-full px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" />
+                      <label class="mt-2 flex items-center gap-2 text-xs text-slate-400">
+                        <input type="checkbox" id="raw-server-list" name="raw-server-list" class="w-4 h-4" />
+                        Use raw HTTPS server list (fetches multiple wss:// endpoints)
+                      </label>
+                      <p class="text-xs text-slate-500 mt-1">
+                        When enabled, the URL above must be a raw HTTPS link with one wss:// endpoint per line.
+                      </p>
+                      <label class="mt-2 flex items-center gap-2 text-xs text-slate-400">
+                        <input type="checkbox" id="sol-memo" name="sol-memo" class="w-4 h-4" />
+                        Use Solana memo lookup (resolve server from blockchain)
+                      </label>
+                      <div id="sol-settings" class="hidden mt-2 flex flex-col gap-2 pl-6 border-l-2 border-purple-800/50">
+                        <div>
+                          <label class="block text-xs font-medium text-slate-400 mb-1" for="sol-address">Solana Address (Base58)</label>
+                          <input type="text" id="sol-address" name="sol-address" placeholder="YourSolanaWalletAddressHere..."
+                            class="w-full px-2 py-1.5 bg-slate-800/60 border border-slate-700 rounded text-sm focus:outline-none focus:border-purple-500 transition-colors font-mono" />
+                        </div>
+                        <div>
+                          <label class="block text-xs font-medium text-slate-400 mb-1" for="sol-rpc-endpoints">RPC Endpoints (one per line)</label>
+                          <textarea id="sol-rpc-endpoints" name="sol-rpc-endpoints" rows="4" placeholder="https://api.mainnet-beta.solana.com&#10;https://solana-rpc.publicnode.com"
+                            class="w-full px-2 py-1.5 bg-slate-800/60 border border-slate-700 rounded text-xs focus:outline-none focus:border-purple-500 transition-colors font-mono"></textarea>
+                        </div>
+                        <p class="text-xs text-slate-500">
+                          Client will query these endpoints to find the encrypted server URL from the Solana address's memo transactions.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm font-medium text-slate-300 mb-2" for="output-name">Output Filename</label>
+                      <input type="text" id="output-name" name="output-name" placeholder="agent (default)"
+                        class="w-full px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" />
+                      <p class="text-xs text-slate-500 mt-1">
+                        Optional: Custom name prefix for output binaries (letters, numbers, . _ - only)
+                      </p>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm font-medium text-slate-300 mb-2" for="mutex">Mutex (Single-Instance Key)</label>
+                      <input type="text" id="mutex" name="mutex" placeholder="Leave empty for random"
+                        class="w-full px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg focus:outline-none focus:border-blue-500 transition-colors" />
+                      <p class="text-xs text-slate-500 mt-1">Optional: set a fixed key or leave empty to auto-generate</p>
+                      <label class="mt-2 flex items-center gap-2 text-xs text-slate-400">
+                        <input type="checkbox" name="disable-mutex" class="w-4 h-4" />
+                        Disable mutex (allow multiple instances)
+                      </label>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <!-- == Section 3: Build Options (open) == -->
+              <div class="accordion-section border border-slate-800 rounded-lg overflow-hidden" data-open="true">
+                <button type="button" class="accordion-header w-full flex items-center justify-between px-4 py-3 bg-slate-800/50 hover:bg-slate-800/80 transition-colors text-left">
+                  <span class="flex items-center gap-2 text-sm font-medium text-slate-200">
+                    <i class="fa-solid fa-sliders text-slate-400"></i> Build Options
+                  </span>
+                  <i class="fa-solid fa-chevron-down accordion-chevron text-slate-400 text-xs"></i>
+                </button>
+                <div class="accordion-body">
+                  <div class="accordion-inner px-4 pb-4 pt-3 flex flex-col gap-2">
+
+                    <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-emerald-400 transition-colors">
+                      <input type="checkbox" name="strip-debug" class="w-4 h-4" checked />
+                      <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-bug-slash text-emerald-400"></i> Strip debug symbols (-s -w)
+                      </span>
+                    </label>
+
+                    <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-emerald-400 transition-colors">
+                      <input type="checkbox" name="disable-cgo" class="w-4 h-4" />
+                      <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-ban text-emerald-400"></i> Disable CGO
+                      </span>
+                    </label>
+
+                    <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-rose-500 transition-colors">
+                      <input type="checkbox" name="no-printing" class="w-4 h-4" />
+                      <div class="flex flex-col">
+                        <span class="flex items-center gap-2">
+                          <i class="fa-solid fa-volume-xmark text-rose-400"></i> Disable Client Printing
+                        </span>
+                        <span class="text-xs text-slate-500">Silence all stdout/stderr and log output</span>
+                      </div>
+                    </label>
+
+                    <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-purple-500 transition-colors">
+                      <input type="checkbox" name="obfuscate" class="w-4 h-4" />
+                      <div class="flex flex-col">
+                        <span class="flex items-center gap-2">
+                          <i class="fa-solid fa-mask text-purple-400"></i> Obfuscate (garble)
+                        </span>
+                        <span class="text-xs text-slate-500">Build with garble for code obfuscation</span>
+                      </div>
+                    </label>
+
+                    <div id="garble-settings-container" class="hidden pl-3 border-l-2 border-purple-500/40 flex flex-col gap-2">
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer">
+                        <input type="checkbox" name="garble-literals" class="w-4 h-4" />
+                        <div class="flex flex-col">
+                          <span>Obfuscate Literals (-literals)</span>
+                          <span class="text-xs text-slate-500">Obfuscate string and byte slice literals</span>
+                        </div>
+                      </label>
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer">
+                        <input type="checkbox" name="garble-tiny" class="w-4 h-4" />
+                        <div class="flex flex-col">
+                          <span>Tiny Mode (-tiny)</span>
+                          <span class="text-xs text-slate-500">Remove filenames and line numbers from panics</span>
+                        </div>
+                      </label>
+                      <div>
+                        <label class="block text-xs font-medium text-slate-400 mb-1" for="garble-seed">Seed</label>
+                        <input type="text" id="garble-seed" name="garble-seed" placeholder="random (default)"
+                          class="w-full px-3 py-2 bg-slate-800/80 border border-slate-700 rounded-lg text-sm focus:outline-none focus:border-purple-500 transition-colors" />
+                        <p class="text-xs text-slate-500 mt-1">Alphanumeric seed for reproducible builds</p>
+                      </div>
+                    </div>
+
+                    <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-cyan-500 transition-colors">
+                      <input type="checkbox" name="enable-upx" class="w-4 h-4" />
+                      <div class="flex flex-col">
+                        <span class="flex items-center gap-2">
+                          <i class="fa-solid fa-compress text-cyan-400"></i> UPX Compression
+                        </span>
+                        <span class="text-xs text-slate-500">Compress binaries with UPX (requires UPX on server)</span>
+                      </div>
+                    </label>
+
+                    <div id="upx-settings-container" class="hidden pl-3 border-l-2 border-cyan-500/40">
+                      <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer">
+                        <input type="checkbox" name="upx-strip-headers" class="w-4 h-4" />
+                        <div class="flex flex-col">
+                          <span>Strip UPX Headers</span>
+                          <span class="text-xs text-slate-500">Remove UPX magic bytes to avoid signature-based detection</span>
+                        </div>
+                      </label>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                      <label class="block text-xs font-medium text-slate-400 mb-1" for="sleep-seconds">
+                        <i class="fa-solid fa-hourglass-half text-yellow-400"></i> Startup Sleep (seconds)
+                      </label>
+                      <input type="number" id="sleep-seconds" name="sleep-seconds" value="0"
+                        min="0" max="3600" step="1"
+                        class="w-full px-3 py-2 bg-slate-800/80 border border-slate-700 rounded-lg text-sm focus:outline-none focus:border-yellow-500 transition-colors" />
+                      <p class="text-xs text-slate-500">Sleep N seconds before connecting (anti-sandbox). Set to 0 to disable.</p>
+                    </div>
+
+                    <label class="flex items-center gap-2 p-3 bg-purple-900/30 border border-purple-500/40 rounded-lg cursor-pointer hover:border-purple-400 transition-colors">
+                      <input type="checkbox" id="cryptable-mode" name="cryptable-mode" class="w-4 h-4" />
+                      <div class="flex flex-col">
+                        <span class="flex items-center gap-2">
+                          <i class="fa-solid fa-microchip text-purple-400"></i> Cryptable Mode
+                        </span>
+                        <span class="text-xs text-slate-500">Disables persistence, UPX, PE metadata, UAC, bound files &amp; other disk-dependent settings for in-memory / shellcode use</span>
+                      </div>
+                    </label>
+                    <div id="cryptable-badge" class="hidden pl-3 border-l-2 border-purple-500/40">
+                      <div class="flex items-center gap-2 px-3 py-1.5 rounded bg-purple-800/40 border border-purple-600/40 text-xs text-purple-300">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Cryptable mode active — incompatible settings have been disabled</span>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <!-- == Section 4: Persistence (collapsed) == -->
+              <div class="accordion-section border border-slate-800 rounded-lg overflow-hidden" data-open="false">
+                <button type="button" class="accordion-header w-full flex items-center justify-between px-4 py-3 bg-slate-800/50 hover:bg-slate-800/80 transition-colors text-left">
+                  <span class="flex items-center gap-2 text-sm font-medium text-slate-200">
+                    <i class="fa-solid fa-power-off text-orange-400"></i>
+                    Persistence
+                    <span class="text-xs text-slate-500 font-normal">Auto-start on boot</span>
+                  </span>
+                  <i class="fa-solid fa-chevron-down accordion-chevron text-slate-400 text-xs"></i>
+                </button>
+                <div class="accordion-body">
+                  <div class="accordion-inner px-4 pb-4 pt-3 flex flex-col gap-2">
+
+                    <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-orange-500 transition-colors">
+                      <input type="checkbox" name="enable-persistence" class="w-4 h-4" />
+                      <div class="flex flex-col">
+                        <span class="flex items-center gap-2">
+                          <i class="fa-solid fa-power-off text-orange-400"></i> Enable Persistence
+                        </span>
+                        <span class="text-xs text-slate-500">Agent will start automatically with system boot</span>
+                      </div>
+                    </label>
+
+                    <div id="persistence-method-container" class="hidden pl-3 border-l-2 border-orange-500/40 flex flex-col gap-3">
+                      <div id="persistence-empty-state" class="hidden text-xs text-slate-500 pt-1">
+                        No supported persistence targets selected. Select Windows, Linux, or macOS targets to configure persistence.
+                      </div>
+
+                      <div id="persistence-windows-settings" class="hidden" data-persistence-os="windows">
+                        <div class="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2">
+                          <i class="fa-brands fa-windows text-blue-400"></i> Windows Persistence Methods
+                          <span class="text-xs text-slate-500 font-normal">(select one or more)</span>
+                        </div>
+                        <div class="flex flex-col gap-2" id="persistence-methods-list">
+                          <label class="flex items-center gap-2 p-2 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-orange-500 transition-colors">
+                            <input type="checkbox" name="persistence-method" value="startup" class="w-4 h-4" checked />
+                            <div class="flex flex-col">
+                              <span class="text-sm text-slate-200">Startup Folder (APPDATA)</span>
+                              <span class="text-xs text-slate-500">Copies agent to user startup folder — no admin required</span>
+                            </div>
+                          </label>
+                          <label class="flex items-center gap-2 p-2 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-orange-500 transition-colors">
+                            <input type="checkbox" name="persistence-method" value="registry" class="w-4 h-4" />
+                            <div class="flex flex-col">
+                              <span class="text-sm text-slate-200">Registry (HKCU Run key)</span>
+                              <span class="text-xs text-slate-500">Adds a Run key under HKCU — no admin required</span>
+                            </div>
+                          </label>
+                          <label class="flex items-center gap-2 p-2 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-orange-500 transition-colors">
+                            <input type="checkbox" name="persistence-method" value="taskscheduler" class="w-4 h-4" />
+                            <div class="flex flex-col">
+                              <span class="text-sm text-slate-200">Task Scheduler (ONLOGON)</span>
+                              <span class="text-xs text-slate-500 text-orange-400/80">Requires admin privileges</span>
+                            </div>
+                          </label>
+                          <label class="flex items-center gap-2 p-2 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-orange-500 transition-colors">
+                            <input type="checkbox" name="persistence-method" value="wmi" class="w-4 h-4" />
+                            <div class="flex flex-col">
+                              <span class="text-sm text-slate-200">WMI Subscription</span>
+                              <span class="text-xs text-slate-500 text-orange-400/80">Requires admin privileges</span>
+                            </div>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div id="persistence-linux-settings" class="hidden" data-persistence-os="linux">
+                        <div class="text-xs font-semibold text-slate-300 mb-1 flex items-center gap-2">
+                          <i class="fa-brands fa-linux text-amber-400"></i> Linux Persistence
+                        </div>
+                        <p class="text-xs text-slate-500">
+                          Uses user-level <code>systemd</code> service when available; falls back to desktop autostart.
+                        </p>
+                      </div>
+
+                      <div id="persistence-macos-settings" class="hidden" data-persistence-os="darwin">
+                        <div class="text-xs font-semibold text-slate-300 mb-1 flex items-center gap-2">
+                          <i class="fa-brands fa-apple text-slate-200"></i> macOS Persistence
+                        </div>
+                        <p class="text-xs text-slate-500">
+                          Uses <code>LaunchAgents</code> for login persistence. The startup name is used as the plist label and <strong class="text-orange-400">must start with <code>com.</code></strong> (e.g. <code>com.apple.updater</code>).
+                        </p>
+                      </div>
+
+                      <div id="persistence-startup-name-container" class="hidden">
+                        <div class="text-xs font-semibold text-slate-300 mb-2 flex items-center gap-2">
+                          <i class="fa-solid fa-file-signature text-blue-400"></i> Startup File Name
+                        </div>
+                        <input type="text" id="startup-name" name="startup-name" maxlength="32"
+                          pattern="[A-Za-z0-9_.-]+"
+                          placeholder="sk (default)"
+                          class="w-full px-3 py-2 bg-slate-800/80 border border-slate-700 rounded-lg text-sm focus:outline-none focus:border-orange-500 transition-colors placeholder:text-slate-600" />
+                        <p class="text-xs text-slate-500 mt-1">Custom name for the installed executable. On Windows: used as filename (<code>svchost</code> → <code>svchost.exe</code>). On macOS: also used as the LaunchAgent label — <span id="startup-name-macos-hint" class="hidden text-orange-400 font-medium">must start with <code>com.</code> (e.g. <code>com.apple.updater</code>).</span><span id="startup-name-default-hint">Leave blank for a default randomized name.</span></p>
+                        <p id="startup-name-error" class="hidden text-xs text-red-400 mt-1 font-medium"></p>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <!-- == Section 5: Windows Settings (hidden until a windows-* platform is checked) == -->
+              <div id="windows-settings-section" class="accordion-section border border-slate-800 rounded-lg overflow-hidden hidden" data-open="false">
+                <button type="button" class="accordion-header w-full flex items-center justify-between px-4 py-3 bg-slate-800/50 hover:bg-slate-800/80 transition-colors text-left">
+                  <span class="flex items-center gap-2 text-sm font-medium text-slate-200">
+                    <i class="fa-brands fa-windows text-blue-400"></i>
+                    Windows Settings
+                    <span class="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-blue-900/60 text-blue-300 border border-blue-700/50 font-semibold">Windows only</span>
+                  </span>
+                  <i class="fa-solid fa-chevron-down accordion-chevron text-slate-400 text-xs"></i>
+                </button>
+                <div class="accordion-body">
+                  <div class="accordion-inner px-4 pb-4 pt-3 flex flex-col gap-4">
+
+                    <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-emerald-500 transition-colors">
+                      <input type="checkbox" name="hide-console" class="w-4 h-4" />
+                      <div class="flex flex-col">
+                        <span class="flex items-center gap-2">
+                          <i class="fa-solid fa-window-minimize text-emerald-400"></i> Hide Console Window
+                        </span>
+                        <span class="text-xs text-slate-500">Builds Windows EXEs as GUI apps (no console window)</span>
+                      </div>
+                    </label>
+
+                    <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-orange-500 transition-colors">
+                      <input type="checkbox" name="require-admin" class="w-4 h-4" />
+                      <div class="flex flex-col">
+                        <span class="flex items-center gap-2">
+                          <i class="fa-solid fa-shield-halved text-orange-400"></i> Require Administrator (UAC)
+                        </span>
+                        <span class="text-xs text-slate-500">Embeds a manifest requesting UAC elevation on launch</span>
+                      </div>
+                    </label>
+
+                    <label class="flex items-center gap-2 p-3 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-red-500 transition-colors">
+                      <input type="checkbox" name="critical-process" class="w-4 h-4" />
+                      <div class="flex flex-col">
+                        <span class="flex items-center gap-2">
+                          <i class="fa-solid fa-skull text-red-400"></i> Critical Process
+                        </span>
+                        <span class="text-xs text-slate-500">If running as admin, marks the process as critical — killing it without disconnect/uninstall triggers a BSOD</span>
+                      </div>
+                    </label>
+
+                    <div>
+                      <label class="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-clone text-cyan-400"></i> Clone Metadata from File
+                        <span class="text-xs text-slate-500 font-normal">Copies metadata &amp; icon from an existing PE</span>
+                      </label>
+                      <div class="flex items-center gap-3 flex-wrap">
+                        <label class="flex items-center gap-2 px-4 py-2 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-cyan-500 transition-colors text-sm">
+                          <i class="fa-solid fa-file-import text-cyan-400"></i>
+                          <span id="clone-exe-label">Choose .exe / .dll file</span>
+                          <input type="file" id="clone-exe-upload" accept=".exe,.dll,.scr,.sys,.ocx" class="hidden" />
+                        </label>
+                        <span id="clone-exe-status" class="text-xs hidden"></span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-file-code text-blue-400"></i> PE / Assembly Metadata
+                      </label>
+                      <div class="flex flex-col gap-2">
+                        <input type="text" id="assembly-title" name="assembly-title" placeholder="File Description"
+                          class="w-full px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-colors" />
+                        <input type="text" id="assembly-product" name="assembly-product" placeholder="Product Name"
+                          class="w-full px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-colors" />
+                        <input type="text" id="assembly-company" name="assembly-company" placeholder="Company Name"
+                          class="w-full px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-colors" />
+                        <input type="text" id="assembly-version" name="assembly-version" placeholder="File Version (e.g. 1.0.0.0)"
+                          class="w-full px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-colors" />
+                        <input type="text" id="assembly-copyright" name="assembly-copyright" placeholder="Copyright"
+                          class="w-full px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-colors" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-image text-yellow-400"></i> Custom Icon
+                        <span class="text-xs text-slate-500 font-normal">.ico, max 1MB</span>
+                      </label>
+                      <div class="flex items-center gap-3">
+                        <label class="flex items-center gap-2 px-4 py-2 bg-slate-800/60 border border-slate-700 rounded-lg cursor-pointer hover:border-yellow-500 transition-colors text-sm">
+                          <i class="fa-solid fa-upload text-yellow-400"></i>
+                          <span id="icon-label">Choose .ico file</span>
+                          <input type="file" id="icon-upload" name="icon-upload" accept=".ico" class="hidden" />
+                        </label>
+                        <button type="button" id="icon-clear" class="hidden text-xs text-red-400 hover:text-red-300">Clear</button>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="block text-sm font-medium text-slate-300 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-file-export text-purple-400"></i> Output Type
+                        <span class="text-xs text-slate-500 font-normal">Windows file extension</span>
+                      </label>
+                      <select id="output-extension" name="output-extension"
+                        class="w-full px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg text-sm focus:outline-none focus:border-blue-500 transition-colors">
+                        <option value=".exe">.exe — Standard Executable</option>
+                        <option value=".scr">.scr — Screen Saver</option>
+                        <option value=".bat">.bat — Batch Script</option>
+                        <option value=".cmd">.cmd — Command Script</option>
+                        <option value=".pif">.pif — Program Info File</option>
+                        <option value=".com">.com — MS-DOS Application</option>
+                      </select>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+
+              <!-- == Section 6: Bind Files (collapsed) == -->
+              <div class="accordion-section border border-slate-800 rounded-lg overflow-hidden" data-open="false">
+                <button type="button" class="accordion-header w-full flex items-center justify-between px-4 py-3 bg-slate-800/50 hover:bg-slate-800/80 transition-colors text-left">
+                  <span class="flex items-center gap-2 text-sm font-medium text-slate-200">
+                    <i class="fa-solid fa-paperclip text-violet-400"></i>
+                    Bind Files
+                    <span class="text-xs text-slate-500 font-normal">Embed &amp; run files on startup</span>
+                  </span>
+                  <i class="fa-solid fa-chevron-down accordion-chevron text-slate-400 text-xs"></i>
+                </button>
+                <div class="accordion-body">
+                  <div class="accordion-inner px-4 pb-4 pt-3 flex flex-col gap-3">
+
+                    <p class="text-xs text-slate-400">
+                      Files are embedded inside the agent binary and written to a temp directory when the agent starts.
+                      Up to 5 files, 50 MB each. Files set to <em>Execute</em> are launched immediately after being dropped.
+                    </p>
+
+                    <!-- macOS Gatekeeper note -->
+                    <div class="flex items-start gap-2 p-3 bg-amber-900/20 border border-amber-700/40 rounded-lg text-xs text-amber-300">
+                      <i class="fa-brands fa-apple mt-0.5 shrink-0"></i>
+                      <span>
+                        <strong>macOS note:</strong> Files are written programmatically and do <em>not</em> receive the quarantine flag,
+                        so Gatekeeper usually will not block them. However, on newer macOS versions (Ventura+) unsigned binaries may
+                        still be restricted depending on system policy.
+                      </span>
+                    </div>
+
+                    <!-- Bound file list -->
+                    <div id="bind-files-list" class="flex flex-col gap-2"></div>
+
+                    <!-- Add file button -->
+                    <label id="bind-add-label" class="flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-dashed border-slate-600 cursor-pointer hover:border-violet-500 transition-colors text-sm text-slate-400 hover:text-violet-400">
+                      <i class="fa-solid fa-plus"></i> Add File
+                      <input type="file" id="bind-file-input" class="hidden" />
+                    </label>
+
+                  </div>
+                </div>
+              </div>
+
+              <!-- Build Button -->
+              <div class="flex gap-2">
+                <button type="submit" id="build-btn"
+                  class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                  <i class="fa-solid fa-hammer"></i>
+                  <span>Start Build</span>
+                </button>
+
+                <button type="button" id="build-update-all-btn"
+                  class="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                  <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                  <span>Build &amp; Update All</span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Build Output -->
+          <div class="bg-slate-900/70 border border-slate-800 rounded-lg p-5">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-terminal"></i> Build Output
+            </h2>
+
+            <div id="build-status" class="mb-4 hidden">
+              <div class="flex items-center gap-2 p-3 rounded-lg bg-blue-900/40 border border-blue-700/60">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span id="build-status-text">Building...</span>
+              </div>
+            </div>
+
+            <div id="build-output-container"
+              class="bg-slate-950 border border-slate-700 rounded-lg p-4 h-96 overflow-y-auto font-mono text-sm">
+              <div id="build-output" class="text-slate-400">
+                Ready to build. Select platforms and click "Start Build".
+              </div>
+            </div>
+
+            <div id="build-results" class="mt-4 hidden">
+              <div class="flex items-center justify-between mb-2">
+                <h3 class="font-medium flex items-center gap-2">
+                  <i class="fa-solid fa-download"></i> Built Clients
+                </h3>
+                <button
+                  id="toggle-all-builds-btn"
+                  class="hidden inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300 text-xs transition-colors"
+                  type="button"
+                >
+                  <i class="fa-solid fa-eye"></i>
+                  <span id="toggle-all-builds-label">Show All</span>
+                </button>
+              </div>
+              <div id="build-files" class="flex flex-col gap-2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Build & Update All Confirmation Modal -->
+    <div id="update-all-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm">
+      <div class="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-10 h-10 rounded-full bg-amber-900/50 border border-amber-700 flex items-center justify-center">
+            <i class="fa-solid fa-arrow-up-from-bracket text-amber-400"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-white">Build &amp; Update All Clients</h3>
+        </div>
+        <div id="update-all-modal-body" class="text-slate-300 text-sm mb-6 space-y-2">
+          <p>Checking eligible clients...</p>
+        </div>
+        <div class="flex items-center justify-end gap-3">
+          <button id="update-all-cancel" type="button"
+            class="px-4 py-2 rounded-lg border border-slate-600 text-slate-300 hover:bg-slate-800 transition-colors text-sm font-medium">
+            Cancel
+          </button>
+          <button id="update-all-confirm" type="button"
+            class="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white transition-colors text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-hammer mr-1"></i> Build &amp; Update
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/assets/nav.js"></script>
+    <script type="module" src="/assets/build.js"></script>
+  </body>
+</html>

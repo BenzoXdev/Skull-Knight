@@ -1,0 +1,681 @@
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings - Skull Knight</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="stylesheet" href="/assets/tailwind.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/assets/main.css" />
+    <link rel="stylesheet" href="/assets/custom.css" />
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <header id="top-nav"></header>
+
+    <main class="max-w-6xl w-full mx-auto px-4 py-8 space-y-6">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-100">Settings</h1>
+        <p class="text-slate-400 text-sm">
+          Manage your account preferences and review banned IP addresses.
+        </p>
+      </div>
+
+      <section class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/30">
+            <i class="fa-brands fa-telegram text-sky-400"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold">News &amp; Updates</h2>
+            <p class="text-sm text-slate-400">Stay up to date with the newest features, releases, and announcements.</p>
+          </div>
+        </div>
+        <div class="rounded-lg border border-slate-700 bg-slate-900 px-4 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="flex-1">
+            <p class="text-sm text-slate-300">
+              Follow the official Skull Knight Telegram channel for the latest updates, changelogs, and feature announcements.
+            </p>
+            <p class="text-xs text-slate-500 mt-1">Channel: <span class="text-slate-400 font-mono">@benzoXdev</span></p>
+          </div>
+          <a
+            href="https://t.me/benzoXdev"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 transition-colors text-white text-sm font-medium whitespace-nowrap"
+          >
+            <i class="fa-brands fa-telegram"></i>
+            Open on Telegram
+          </a>
+        </div>
+      </section>
+
+      <section id="export-import-section" class="hidden bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/30">
+            <i class="fa-solid fa-file-export text-amber-400"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold">Export &amp; Import Settings</h2>
+            <p class="text-sm text-slate-400">Backup or restore your Skull Knight configuration (notifications, security, TLS, appearance, auth tokens).</p>
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-slate-700 bg-slate-900 px-4 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="flex-1 space-y-1">
+            <p class="text-sm text-slate-300">
+              <strong>Export</strong> &mdash; Downloads a JSON file with all current settings and auth tokens.
+            </p>
+            <p class="text-xs text-slate-500">Keep this file secure &mdash; it contains sensitive tokens.</p>
+          </div>
+          <button
+            id="export-settings-btn"
+            type="button"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 transition-colors text-white text-sm font-medium whitespace-nowrap"
+          >
+            <i class="fa-solid fa-download"></i>
+            Export Settings
+          </button>
+        </div>
+
+        <div class="rounded-lg border border-slate-700 bg-slate-900 px-4 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="flex-1 space-y-1">
+            <p class="text-sm text-slate-300">
+              <strong>Import</strong> &mdash; Restore settings from a previously exported JSON file.
+            </p>
+            <p class="text-xs text-slate-500">Auth token changes require a server restart. Environment variables will still take priority.</p>
+          </div>
+          <label
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 transition-colors text-white text-sm font-medium whitespace-nowrap cursor-pointer"
+          >
+            <i class="fa-solid fa-upload"></i>
+            Import Settings
+            <input id="import-settings-file" type="file" accept=".json,application/json" class="hidden" />
+          </label>
+        </div>
+
+        <p id="export-import-message" class="hidden text-sm rounded-lg px-3 py-2 border"></p>
+      </section>
+
+      <section id="wipe-offline-section" class="hidden bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/30">
+            <i class="fa-solid fa-circle-minus text-red-400"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold">Wipe Offline Clients</h2>
+            <p class="text-sm text-slate-400">Permanently remove all offline clients from the dashboard in one click.</p>
+          </div>
+        </div>
+        <div class="rounded-lg border border-slate-700 bg-slate-900 px-4 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+          <div class="flex-1">
+            <p class="text-sm text-slate-300">
+              Deletes every client currently marked as offline. If any of them reconnect later they will reappear automatically.
+            </p>
+          </div>
+          <button
+            id="wipe-offline-btn"
+            type="button"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-red-800/70 hover:bg-red-700 transition-colors text-red-100 border border-red-700 text-sm font-medium whitespace-nowrap"
+          >
+            <i class="fa-solid fa-circle-minus"></i>
+            Wipe Offline
+          </button>
+        </div>
+        <p id="wipe-offline-message" class="hidden text-sm rounded-lg px-3 py-2 border"></p>
+      </section>
+
+      <!-- Account + Banned IPs -->
+      <section class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <!-- Account -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/30">
+              <i class="fa-solid fa-user text-sky-400"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-semibold">Account</h2>
+              <p class="text-sm text-slate-400">View your account info and update your password.</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            <div class="rounded-lg bg-slate-900 border border-slate-800 px-3 py-2">
+              <div class="text-slate-400">Username</div>
+              <div id="settings-username" class="font-medium">-</div>
+            </div>
+            <div class="rounded-lg bg-slate-900 border border-slate-800 px-3 py-2">
+              <div class="text-slate-400">Role</div>
+              <div id="settings-role" class="font-medium">-</div>
+            </div>
+          </div>
+
+          <form id="password-form" class="space-y-3 mt-2 pt-4 border-t border-slate-800">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 pb-1">Change Password</p>
+            <input
+              id="current-password"
+              type="password"
+              autocomplete="current-password"
+              placeholder="Current password"
+              class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              required
+            />
+            <input
+              id="new-password"
+              type="password"
+              autocomplete="new-password"
+              minlength="6"
+              placeholder="New password (min 6 chars)"
+              class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              required
+            />
+            <input
+              id="confirm-password"
+              type="password"
+              autocomplete="new-password"
+              minlength="6"
+              placeholder="Confirm new password"
+              class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              required
+            />
+            <div class="pt-1">
+              <p id="password-policy-hint" class="text-xs text-slate-400 mb-3"></p>
+            </div>
+            <button
+              type="submit"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sky-600 hover:bg-sky-500 transition-colors text-white text-sm font-medium"
+            >
+              <i class="fa-solid fa-key"></i>Update Password
+            </button>
+          </form>
+
+          <p id="settings-message" class="hidden text-sm rounded-lg px-3 py-2 border"></p>
+        </div>
+
+        <!-- Banned IPs -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/30">
+                <i class="fa-solid fa-ban text-red-400"></i>
+              </div>
+              <div>
+                <h2 class="text-lg font-semibold">Banned IPs</h2>
+                <p class="text-sm text-slate-400">Unban blocked agent source IPs.</p>
+              </div>
+            </div>
+            <button
+              id="refresh-bans-btn"
+              class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sm transition-colors"
+              type="button"
+            >
+              <i class="fa-solid fa-rotate"></i>Refresh
+            </button>
+          </div>
+
+          <div id="bans-permission-note" class="hidden rounded-lg border border-amber-800 bg-amber-900/20 text-amber-200 px-3 py-2 text-sm">
+            Your role does not allow IP unban actions.
+          </div>
+
+          <div class="overflow-x-auto border border-slate-800 rounded-lg">
+            <table class="w-full text-sm">
+              <thead class="bg-slate-800/60 text-slate-300">
+                <tr>
+                  <th class="text-left px-3 py-2">IP</th>
+                  <th class="text-left px-3 py-2">Reason</th>
+                  <th class="text-left px-3 py-2">Banned At</th>
+                  <th class="text-right px-3 py-2">Action</th>
+                </tr>
+              </thead>
+              <tbody id="bans-table-body" class="divide-y divide-slate-800">
+                <tr>
+                  <td colspan="4" class="px-3 py-6 text-center text-slate-400">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Active Sessions -->
+      <section class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+              <i class="fa-solid fa-desktop text-emerald-400"></i>
+            </div>
+            <div>
+              <h2 class="text-lg font-semibold">Active Sessions</h2>
+              <p class="text-sm text-slate-400">View and manage your active login sessions.</p>
+            </div>
+          </div>
+          <button
+            id="refresh-sessions-btn"
+            class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-sm transition-colors"
+            type="button"
+          >
+            <i class="fa-solid fa-rotate"></i>Refresh
+          </button>
+          <button
+            id="remove-inactive-sessions-btn"
+            class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-red-900/40 hover:bg-red-800/60 text-red-100 border border-red-700/60 text-sm transition-colors"
+            type="button"
+          >
+            <i class="fa-solid fa-broom"></i>Remove Inactive
+          </button>
+        </div>
+
+        <div class="overflow-x-auto border border-slate-800 rounded-lg">
+          <table class="w-full text-sm">
+            <thead class="bg-slate-800/60 text-slate-300">
+              <tr>
+                <th class="text-left px-3 py-2">IP</th>
+                <th class="text-left px-3 py-2">Browser / Client</th>
+                <th class="text-left px-3 py-2">Created</th>
+                <th class="text-left px-3 py-2">Last Active</th>
+                <th class="text-left px-3 py-2">Status</th>
+                <th class="text-right px-3 py-2">Action</th>
+              </tr>
+            </thead>
+            <tbody id="sessions-table-body" class="divide-y divide-slate-800">
+              <tr>
+                <td colspan="6" class="px-3 py-6 text-center text-slate-400">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p id="sessions-message" class="hidden text-sm rounded-lg px-3 py-2 border"></p>
+      </section>
+
+      <!-- Dashboard Preferences -->
+      <section class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-violet-500/10 border border-violet-500/30">
+            <i class="fa-solid fa-sliders text-violet-400"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold">Dashboard Preferences</h2>
+            <p class="text-sm text-slate-400">Configure notifications, client refresh rate, and navigation layout.</p>
+          </div>
+        </div>
+
+        <form id="prefs-form" class="space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Notifications</p>
+              <label class="flex items-center gap-2 text-sm">
+                <input id="pref-notifications" type="checkbox" class="h-4 w-4" />
+                <span>Enable notification badge updates</span>
+              </label>
+              <label class="flex items-center gap-2 text-sm">
+                <input id="pref-desktop-notifications" type="checkbox" class="h-4 w-4 accent-emerald-500" />
+                <span>Enable desktop (OS) notifications</span>
+              </label>
+              <p id="pref-desktop-notifications-hint" class="hidden text-xs text-amber-400">
+                <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+                Browser permission was denied. Reset notification permissions for this site in your browser settings, then try again.
+              </p>
+            </div>
+
+            <div class="space-y-2">
+              <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Refresh Interval</p>
+              <label class="block">
+                <span class="text-sm text-slate-300">Client refresh interval (seconds)</span>
+                <input
+                  id="pref-refresh-seconds"
+                  type="number"
+                  min="3"
+                  max="120"
+                  class="mt-1 w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                />
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Navigation Layout</p>
+            <div class="flex gap-2">
+              <button type="button" id="pref-nav-sidebar"
+                class="nav-layout-btn flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors">
+                <i class="fa-solid fa-table-columns"></i> Sidebar
+              </button>
+              <button type="button" id="pref-nav-topbar"
+                class="nav-layout-btn flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-colors">
+                <i class="fa-solid fa-bars"></i> Top Bar
+              </button>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">Changes apply immediately on save.</p>
+          </div>
+
+          <div class="space-y-2">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Visibility</p>
+            <label class="flex items-center gap-2 text-sm">
+              <input id="pref-nav-hidden" type="checkbox" class="h-4 w-4 accent-indigo-500" />
+              <span>Hide navigation bar</span>
+            </label>
+            <p class="text-xs text-slate-500">Press <kbd class="px-1 py-0.5 rounded bg-slate-800 border border-slate-700 text-slate-400 text-[10px]">Ctrl+\</kbd> to toggle anytime.</p>
+          </div>
+
+          <button
+            type="submit"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-700 hover:bg-violet-600 transition-colors text-white text-sm font-medium"
+          >
+            <i class="fa-solid fa-floppy-disk"></i>Save Preferences
+          </button>
+        </form>
+      </section>
+
+      <!-- Notification Delivery -->
+      <section id="telegram-settings" class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+            <i class="fa-solid fa-bell text-emerald-400"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold">Notification Delivery</h2>
+            <p class="text-sm text-slate-400">Configure where alerts and notifications are sent.</p>
+          </div>
+        </div>
+        <div class="rounded-lg border border-slate-700 bg-slate-900 px-4 py-4">
+          <p class="text-sm text-slate-300">
+            Webhook and Telegram Bot settings have moved to the
+            <a href="/notifications" class="text-sky-400 hover:underline font-medium">Notifications page</a>.
+            Configure your personal webhook and Telegram bot there.
+          </p>
+        </div>
+      </section>
+
+      <!-- Security Policy -->
+      <section class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/30">
+            <i class="fa-solid fa-shield-halved text-indigo-400"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold">Security Policy</h2>
+            <p class="text-sm text-slate-400">Admin-only global security controls.</p>
+          </div>
+        </div>
+
+        <form id="security-form" class="space-y-4">
+          <div id="security-permission-note" class="hidden rounded-lg border border-amber-800 bg-amber-900/20 text-amber-200 px-3 py-2 text-sm">
+            Only admins can update security policy settings.
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <label class="block">
+              <span class="text-sm text-slate-300">Session TTL (hours)</span>
+              <input
+                id="security-session-ttl"
+                type="number"
+                min="1"
+                max="720"
+                class="mt-1 w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </label>
+            <label class="block">
+              <span class="text-sm text-slate-300">Max login attempts</span>
+              <input
+                id="security-login-max-attempts"
+                type="number"
+                min="1"
+                max="50"
+                class="mt-1 w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </label>
+            <label class="block">
+              <span class="text-sm text-slate-300">Login window (minutes)</span>
+              <input
+                id="security-login-window"
+                type="number"
+                min="1"
+                max="1440"
+                class="mt-1 w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </label>
+            <label class="block">
+              <span class="text-sm text-slate-300">Lockout duration (minutes)</span>
+              <input
+                id="security-lockout"
+                type="number"
+                min="1"
+                max="1440"
+                class="mt-1 w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </label>
+            <label class="block">
+              <span class="text-sm text-slate-300">Minimum password length</span>
+              <input
+                id="security-password-min"
+                type="number"
+                min="6"
+                max="128"
+                class="mt-1 w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </label>
+          </div>
+
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Password Requirements</p>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
+              <label class="flex items-center gap-2">
+                <input id="security-require-uppercase" type="checkbox" class="h-4 w-4" />
+                <span>Uppercase</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input id="security-require-lowercase" type="checkbox" class="h-4 w-4" />
+                <span>Lowercase</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input id="security-require-number" type="checkbox" class="h-4 w-4" />
+                <span>Number</span>
+              </label>
+              <label class="flex items-center gap-2">
+                <input id="security-require-symbol" type="checkbox" class="h-4 w-4" />
+                <span>Symbol</span>
+              </label>
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            id="security-save-btn"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-700 hover:bg-indigo-600 transition-colors text-white text-sm font-medium"
+          >
+            <i class="fa-solid fa-shield-halved"></i>Save Security Policy
+          </button>
+        </form>
+      </section>
+
+      <!-- TLS Certificates -->
+      <section class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-cyan-500/10 border border-cyan-500/30">
+            <i class="fa-solid fa-certificate text-cyan-400"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold">TLS Certificates</h2>
+            <p class="text-sm text-slate-400">Admin-only TLS source configuration. Changes apply after server restart.</p>
+          </div>
+        </div>
+
+        <form id="tls-form" class="space-y-4">
+          <div id="tls-permission-note" class="hidden rounded-lg border border-amber-800 bg-amber-900/20 text-amber-200 px-3 py-2 text-sm">
+            Only admins can update TLS settings.
+          </div>
+
+          <label class="flex items-center gap-2 text-sm">
+            <input id="tls-certbot-enabled" type="checkbox" class="h-4 w-4" />
+            <span>Use certbot certificates in production runtime (NODE_ENV=production)</span>
+          </label>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <label class="block">
+              <span class="text-sm text-slate-300">Let's Encrypt account email</span>
+              <input
+                id="tls-certbot-email"
+                type="email"
+                placeholder="admin@example.com"
+                class="mt-1 w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </label>
+            <label class="block">
+              <span class="text-sm text-slate-300">Certbot live base path</span>
+              <input
+                id="tls-certbot-live-path"
+                type="text"
+                placeholder="/etc/letsencrypt/live"
+                class="mt-1 w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </label>
+            <label class="block">
+              <span class="text-sm text-slate-300">Certbot domain folder</span>
+              <input
+                id="tls-certbot-domain"
+                type="text"
+                placeholder="example.com"
+                class="mt-1 w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </label>
+            <label class="block">
+              <span class="text-sm text-slate-300">Cert file name</span>
+              <input
+                id="tls-certbot-cert-file"
+                type="text"
+                placeholder="fullchain.pem"
+                class="mt-1 w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </label>
+            <label class="block">
+              <span class="text-sm text-slate-300">Key file name</span>
+              <input
+                id="tls-certbot-key-file"
+                type="text"
+                placeholder="privkey.pem"
+                class="mt-1 w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </label>
+            <label class="block">
+              <span class="text-sm text-slate-300">CA chain file name</span>
+              <input
+                id="tls-certbot-ca-file"
+                type="text"
+                placeholder="chain.pem"
+                class="mt-1 w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </label>
+          </div>
+
+          <div class="rounded-lg border border-slate-700 bg-slate-900 px-4 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+            <div class="flex-1">
+              <p class="text-sm text-slate-300">One-click setup requirements: DNS for the domain must point to this server and inbound port 80 must be reachable.</p>
+            </div>
+            <button
+              type="button"
+              id="tls-certbot-auto-btn"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-700 hover:bg-emerald-600 transition-colors text-white text-sm font-medium whitespace-nowrap"
+            >
+              <i class="fa-solid fa-wand-magic-sparkles"></i>Auto Setup Free SSL
+            </button>
+          </div>
+
+          <button
+            type="submit"
+            id="tls-save-btn"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-700 hover:bg-cyan-600 transition-colors text-white text-sm font-medium"
+          >
+            <i class="fa-solid fa-certificate"></i>Save TLS Settings
+          </button>
+        </form>
+      </section>
+
+      <!-- Team Chat -->
+      <section id="chat-settings-section" class="hidden bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-sky-500/10 border border-sky-500/30">
+            <i class="fa-solid fa-comments text-sky-400"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold">Team Chat</h2>
+            <p class="text-sm text-slate-400">Admin-only. Configure message retention for the team chat.</p>
+          </div>
+        </div>
+
+        <form id="chat-settings-form" class="space-y-4">
+          <label class="block">
+            <span class="text-sm text-slate-300 font-medium">Message Retention (days)</span>
+            <input
+              type="number"
+              id="chat-retention-days"
+              min="0"
+              max="365"
+              step="1"
+              class="mt-1 w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 text-sm"
+            />
+            <p class="text-xs text-slate-500 mt-1">Messages older than this will be automatically deleted. Set to 0 to keep messages forever. Max 365 days.</p>
+          </label>
+
+          <button
+            type="submit"
+            id="chat-settings-save-btn"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sky-700 hover:bg-sky-600 transition-colors text-white text-sm font-medium"
+          >
+            <i class="fa-solid fa-floppy-disk"></i>Save Chat Settings
+          </button>
+        </form>
+      </section>
+
+      <!-- Custom CSS -->
+      <section class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-fuchsia-500/10 border border-fuchsia-500/30">
+            <i class="fa-solid fa-paintbrush text-fuchsia-400"></i>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold">Custom CSS</h2>
+            <p class="text-sm text-slate-400">Admin-only. Paste custom CSS to override the default theme across all pages.</p>
+          </div>
+        </div>
+
+        <form id="appearance-form" class="space-y-4">
+          <div id="appearance-permission-note" class="hidden rounded-lg border border-amber-800 bg-amber-900/20 text-amber-200 px-3 py-2 text-sm">
+            Only admins can update custom CSS.
+          </div>
+
+          <label class="block">
+            <textarea
+              id="appearance-custom-css"
+              rows="12"
+              spellcheck="false"
+              placeholder="/* Paste your custom CSS here */&#10;:root { --color-primary: #f59e0b; }"
+              class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 font-mono text-xs resize-y"
+            ></textarea>
+            <p class="text-xs text-slate-500 mt-1">Max 50 KB. Reload any open page after saving to see the new styles.</p>
+          </label>
+
+          <button
+            type="submit"
+            id="appearance-save-btn"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-fuchsia-700 hover:bg-fuchsia-600 transition-colors text-white text-sm font-medium"
+          >
+            <i class="fa-solid fa-paintbrush"></i>Save Custom CSS
+          </button>
+        </form>
+      </section>
+
+      <footer class="text-center text-sm text-slate-500 py-4 border-t border-slate-800 mt-4">
+        <p>Created by benzoXdev &mdash; <a href="https://t.me/benzoXdev" target="_blank" rel="noopener noreferrer" class="text-sky-400 hover:text-sky-300 transition-colors"><i class="fa-brands fa-telegram"></i> t.me/benzoXdev</a></p>
+      </footer>
+
+    </main>
+
+    <script type="module" src="/assets/nav.js"></script>
+    <script type="module" src="/assets/settings.js"></script>
+  </body>
+</html>

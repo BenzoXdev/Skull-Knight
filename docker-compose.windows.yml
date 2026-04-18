@@ -1,0 +1,67 @@
+services:
+  skull-knight-server:
+    image: ${DOCKER_IMAGE:-ghcr.io/benzoXdev/skull-knight:latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+      cache_from:
+        - type=local,src=.docker-cache/buildx
+      cache_to:
+        - type=local,dest=.docker-cache/buildx,mode=max
+    container_name: skull-knight-server
+    ports:
+      - "${PORT:-5173}:5173"
+    environment:
+      PORT: 5173
+      HOST: 0.0.0.0
+      # Optional: set an explicit initial admin account. If SKULL_KNIGHT_PASS is empty,
+      # the server generates one-time bootstrap secrets and stores them in /app/data/save.json.
+      SKULL_KNIGHT_USER: ${SKULL_KNIGHT_USER:-admin}
+      SKULL_KNIGHT_PASS: ${SKULL_KNIGHT_PASS:-}
+      # Optional overrides. If empty, generated and persisted to /app/data/save.json.
+      JWT_SECRET: ${JWT_SECRET:-}
+      SKULL_KNIGHT_AGENT_TOKEN: ${SKULL_KNIGHT_AGENT_TOKEN:-}
+      NODE_ENV: ${NODE_ENV:-production}
+      SKULL_KNIGHT_TLS_CERT: ${SKULL_KNIGHT_TLS_CERT:-/app/certs/server.crt}
+      SKULL_KNIGHT_TLS_KEY: ${SKULL_KNIGHT_TLS_KEY:-/app/certs/server.key}
+      SKULL_KNIGHT_TLS_CA: ${SKULL_KNIGHT_TLS_CA:-}
+      # Set true only behind a trusted reverse proxy that terminates TLS (for example Render).
+      # Default false keeps current behavior: Skull Knight terminates TLS in-process.
+      SKULL_KNIGHT_TLS_OFFLOAD: ${SKULL_KNIGHT_TLS_OFFLOAD:-false}
+      # Cookie security mode: auto (default), true, or false.
+      # auto: Secure cookie on HTTPS requests / X-Forwarded-Proto=https.
+      SKULL_KNIGHT_AUTH_COOKIE_SECURE: ${SKULL_KNIGHT_AUTH_COOKIE_SECURE:-auto}
+      # Optional certbot integration (used only when NODE_ENV=production)
+      SKULL_KNIGHT_TLS_CERTBOT_ENABLED: ${SKULL_KNIGHT_TLS_CERTBOT_ENABLED:-false}
+      SKULL_KNIGHT_TLS_CERTBOT_LIVE_PATH: ${SKULL_KNIGHT_TLS_CERTBOT_LIVE_PATH:-/etc/letsencrypt/live}
+      SKULL_KNIGHT_TLS_CERTBOT_DOMAIN: ${SKULL_KNIGHT_TLS_CERTBOT_DOMAIN:-}
+      SKULL_KNIGHT_TLS_CERTBOT_CERT_FILE: ${SKULL_KNIGHT_TLS_CERTBOT_CERT_FILE:-fullchain.pem}
+      SKULL_KNIGHT_TLS_CERTBOT_KEY_FILE: ${SKULL_KNIGHT_TLS_CERTBOT_KEY_FILE:-privkey.pem}
+      SKULL_KNIGHT_TLS_CERTBOT_CA_FILE: ${SKULL_KNIGHT_TLS_CERTBOT_CA_FILE:-chain.pem}
+      SKULL_KNIGHT_CLIENT_BUILD_CACHE_DIR: ${SKULL_KNIGHT_CLIENT_BUILD_CACHE_DIR:-/app/client-build-cache}
+      SKULL_KNIGHT_FILE_UPLOAD_INTENT_TTL_MS: ${SKULL_KNIGHT_FILE_UPLOAD_INTENT_TTL_MS:-1800000}
+      SKULL_KNIGHT_FILE_UPLOAD_PULL_TTL_MS: ${SKULL_KNIGHT_FILE_UPLOAD_PULL_TTL_MS:-1800000}
+    volumes:
+      - skull-knight-data:/app/data
+      - skull-knight-certs:/app/certs
+      - skull-knight-client-build-cache:/app/client-build-cache
+      # Uncomment to mount host certbot certs read-only
+      # - /etc/letsencrypt:/etc/letsencrypt:ro
+      # Uncomment to use a static config file instead of env vars
+      # - ./skull-knight-server/config.json:/app/config.json:ro
+    restart: unless-stopped
+    init: true
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      # Use http:// when SKULL_KNIGHT_TLS_OFFLOAD=true.
+      test: ["CMD-SHELL", "curl -f ${SKULL_KNIGHT_HEALTHCHECK_URL:-https://localhost:5173/health} >/dev/null 2>&1 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  skull-knight-data:
+  skull-knight-certs:
+  skull-knight-client-build-cache:

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skull Knight – Connect</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <script src="renderer.js" defer></script>
+</head>
+<body>
+  <!-- Background particles (matches Skull Knight login aesthetic) -->
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <div class="connect-card">
+    <div class="crown-wrapper">
+      <i class="fa-solid fa-crown crown-icon"></i>
+    </div>
+    <div class="brand">Skull Knight</div>
+    <h2 class="title">Connect to Server</h2>
+    <p class="subtitle">Enter the address of your Skull Knight server</p>
+
+    <form id="connect-form">
+      <div class="form-group">
+        <label class="label" for="host">Host / IP Address</label>
+        <div class="input-row">
+          <i class="fa-solid fa-server"></i>
+          <input id="host" name="host" type="text" required
+                 placeholder="e.g. 192.168.1.100 or my.server.com"
+                 spellcheck="false" autocomplete="off" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="label" for="port">Port</label>
+        <div class="input-row">
+          <i class="fa-solid fa-hashtag"></i>
+          <input id="port" name="port" type="number" required
+                 min="1" max="65535" value="5173"
+                 placeholder="5173" />
+        </div>
+      </div>
+
+      <div class="form-group toggle-row">
+        <label class="toggle-label" for="use-tls">
+          <i class="fa-solid fa-lock"></i>
+          Use TLS (HTTPS)
+        </label>
+        <label class="switch">
+          <input id="use-tls" type="checkbox" checked />
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <button type="submit" class="button primary" id="connect-btn">
+        <span class="btn-text">Connect</span>
+        <i class="fa-solid fa-arrow-right btn-icon"></i>
+      </button>
+
+      <div id="status" class="status" aria-live="polite"></div>
+    </form>
+  </div>
+</body>
+</html>

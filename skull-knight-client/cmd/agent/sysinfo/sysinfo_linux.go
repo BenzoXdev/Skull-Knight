@@ -1,0 +1,99 @@
+//go:build linux
+
+package sysinfo
+
+import (
+	"fmt"
+	"os"
+	"strings"
+)
+
+func collectPlatform() Info {
+	return Info{
+		CPU: cpuName(),
+		GPU: gpuName(),
+		RAM: totalRAM(),
+	}
+}
+
+func cpuName() string {
+	data, err := os.ReadFile("/proc/cpuinfo")
+	if err != nil {
+		return "unknown"
+	}
+	for _, line := range strings.Split(string(data), "\n") {
+		if strings.HasPrefix(line, "model name") {
+			parts := strings.SplitN(line, ":", 2)
+			if len(parts) == 2 {
+				return strings.TrimSpace(parts[1])
+			}
+		}
+	}
+	return "unknown"
+}
+
+func gpuName() string {
+	entries, err := os.ReadDir("/sys/class/drm")
+	if err != nil {
+		return "unknown"
+	}
+	var gpus []string
+	seen := map[string]bool{}
+	for _, e := range entries {
+		if !strings.HasPrefix(e.Name(), "card") || strings.Contains(e.Name(), "-") {
+			continue
+		}
+		labelPath := "/sys/class/drm/" + e.Name() + "/device/label"
+		if data, err := os.ReadFile(labelPath); err == nil {
+			name := strings.TrimSpace(string(data))
+			if name != "" && !seen[name] {
+				seen[name] = true
+				gpus = append(gpus, name)
+				continue
+			}
+		}
+
+		ueventPath := "/sys/class/drm/" + e.Name() + "/device/uevent"
+		if data, err := os.ReadFile(ueventPath); err == nil {
+			for _, line := range strings.Split(string(data), "\n") {
+				if strings.HasPrefix(line, "DRIVER=") {
+					drv := strings.TrimPrefix(line, "DRIVER=")
+					if drv != "" && !seen[drv] {
+						seen[drv] = true
+						gpus = append(gpus, drv)
+					}
+				}
+			}
+		}
+	}
+	if len(gpus) == 0 {
+		return "unknown"
+	}
+	return strings.Join(gpus, ", ")
+}
+
+func totalRAM() string {
+	data, err := os.ReadFile("/proc/meminfo")
+	if err != nil {
+		return "unknown"
+	}
+	for _, line := range strings.Split(string(data), "\n") {
+		if strings.HasPrefix(line, "MemTotal:") {
+			fields := strings.Fields(line)
+			if len(fields) >= 2 {
+				var kb uint64
+				_, err := fmt.Sscanf(fields[1], "%d", &kb)
+				if err != nil {
+					return "unknown"
+				}
+				gb := float64(kb) / (1024 * 1024)
+				if gb >= 1 {
+					return fmt.Sprintf("%.0f GB", gb)
+				}
+				mb := float64(kb) / 1024
+				return fmt.Sprintf("%.0f MB", mb)
+			}
+		}
+	}
+	return "unknown"
+}

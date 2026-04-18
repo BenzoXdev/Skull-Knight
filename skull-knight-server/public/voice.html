@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voice Support</title>
+    <link rel="stylesheet" href="/assets/tailwind.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/assets/main.css" />
+    <link rel="stylesheet" href="/assets/custom.css" />
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <header id="top-nav"></header>
+    <main class="px-5 py-6">
+      <div class="max-w-4xl mx-auto rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <h1 class="text-2xl font-semibold">Voice Support</h1>
+            <p class="text-slate-400">Live two-way audio channel for remote support.</p>
+          </div>
+          <span id="status-pill" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-700 bg-slate-800 text-slate-300">
+            <i class="fa-solid fa-plug-circle-xmark"></i><span>Disconnected</span>
+          </span>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <button id="connect-btn" class="px-4 py-3 rounded-lg border border-emerald-700 bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-100 font-medium">
+            <i class="fa-solid fa-phone-volume"></i> Connect Voice
+          </button>
+          <button id="disconnect-btn" class="px-4 py-3 rounded-lg border border-red-700 bg-red-900/40 hover:bg-red-800/60 text-red-100 font-medium" disabled>
+            <i class="fa-solid fa-phone-slash"></i> Disconnect Voice
+          </button>
+        </div>
+
+        <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <label class="text-sm text-slate-300 flex flex-col gap-1">
+            <span>Client Audio Source</span>
+            <select id="source-select" class="bg-slate-900/70 border border-slate-700 rounded-lg px-3 py-2 text-slate-100">
+              <option value="microphone">Microphone</option>
+            </select>
+          </label>
+          <button id="mute-self-btn" class="px-4 py-2 rounded-lg border border-slate-700 bg-slate-800/70 hover:bg-slate-700 text-slate-200">
+            <i class="fa-solid fa-microphone"></i> Mute Me
+          </button>
+          <button id="mute-remote-btn" class="px-4 py-2 rounded-lg border border-slate-700 bg-slate-800/70 hover:bg-slate-700 text-slate-200">
+            <i class="fa-solid fa-volume-high"></i> Mute Them
+          </button>
+        </div>
+
+        <div class="mt-6 space-y-4">
+          <div>
+            <div class="flex items-center gap-3 mb-1">
+              <span class="text-sm text-slate-300">Your Mic (You -> Client)</span>
+              <div class="flex items-center gap-2 text-xs text-slate-400 ml-auto">
+                <i class="fa-solid fa-microphone"></i>
+                <input id="mic-volume" type="range" min="0" max="200" value="100" step="1" class="w-28 accent-cyan-500 cursor-pointer" />
+                <span id="mic-volume-label" class="w-10 text-right">100%</span>
+              </div>
+            </div>
+            <canvas id="local-wave" class="mt-2 w-full h-20 rounded-lg border border-slate-700 bg-slate-900/60"></canvas>
+          </div>
+          <div>
+            <div class="flex items-center gap-3 mb-1">
+              <span class="text-sm text-slate-300">Client Audio (Client -> You)</span>
+              <div class="flex items-center gap-2 text-xs text-slate-400 ml-auto">
+                <i class="fa-solid fa-volume-high"></i>
+                <input id="remote-volume" type="range" min="0" max="200" value="100" step="1" class="w-28 accent-emerald-500 cursor-pointer" />
+                <span id="remote-volume-label" class="w-10 text-right">100%</span>
+              </div>
+            </div>
+            <canvas id="remote-wave" class="mt-2 w-full h-20 rounded-lg border border-slate-700 bg-slate-900/60"></canvas>
+          </div>
+          <div class="text-xs text-slate-500">Uses native Go audio capture/playback on the client agent. If unavailable, rebuild agent with CGO enabled.</div>
+        </div>
+      </div>
+
+      <div class="max-w-4xl mx-auto mt-6 rounded-2xl border border-slate-800 bg-slate-900/70 p-6 shadow-xl">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <div>
+            <h1 class="text-2xl font-semibold"><i class="fa-solid fa-volume-high text-slate-400"></i> Desktop Audio</h1>
+            <p class="text-slate-400">Listen to the client's system audio (speakers/loopback). Listen-only, no mic.</p>
+          </div>
+          <span id="da-status-pill" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-700 bg-slate-800 text-slate-300">
+            <i class="fa-solid fa-plug-circle-xmark"></i><span>Disconnected</span>
+          </span>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <button id="da-connect-btn" class="px-4 py-3 rounded-lg border border-emerald-700 bg-emerald-900/40 hover:bg-emerald-800/60 text-emerald-100 font-medium">
+            <i class="fa-solid fa-play"></i> Start Listening
+          </button>
+          <button id="da-disconnect-btn" class="px-4 py-3 rounded-lg border border-red-700 bg-red-900/40 hover:bg-red-800/60 text-red-100 font-medium" disabled>
+            <i class="fa-solid fa-stop"></i> Stop Listening
+          </button>
+        </div>
+
+        <div class="mt-4">
+          <div class="flex items-center gap-3 mb-1">
+            <span class="text-sm text-slate-300">Desktop Audio (Client Speakers -> You)</span>
+            <div class="flex items-center gap-2 text-xs text-slate-400 ml-auto">
+              <i class="fa-solid fa-volume-high"></i>
+              <input id="da-volume" type="range" min="0" max="200" value="100" step="1" class="w-28 accent-amber-500 cursor-pointer" />
+              <span id="da-volume-label" class="w-10 text-right">100%</span>
+            </div>
+          </div>
+          <canvas id="da-wave" class="mt-2 w-full h-20 rounded-lg border border-slate-700 bg-slate-900/60"></canvas>
+        </div>
+        <div class="mt-2 text-xs text-slate-500">Captures system/loopback audio from the client. Requires a Stereo Mix or loopback capture device enabled on the client machine.</div>
+      </div>
+    </main>
+    <script type="module" src="/assets/nav.js"></script>
+    <script type="module" src="/assets/voice.js"></script>
+  </body>
+</html>

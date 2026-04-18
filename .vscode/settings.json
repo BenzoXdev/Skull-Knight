@@ -1,0 +1,7 @@
+{
+  "testing.exclude": {
+    "**/skull-knight-server/dist/**": true,
+    "**/dist/skull-knight-client/**": true,
+    "**/dist-clients/**": true
+  }
+}

@@ -1,0 +1,59 @@
+name: tests
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  server-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: skull-knight-server
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install server dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run server tests
+        run: bun test ./src
+
+  client-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: skull-knight-client
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: skull-knight-client/go.mod
+          cache: true
+          cache-dependency-path: |
+            skull-knight-client/go.sum
+            go.work.sum
+
+      - name: Download Go modules
+        run: go mod download
+
+      - name: Run client tests
+        run: go test ./...

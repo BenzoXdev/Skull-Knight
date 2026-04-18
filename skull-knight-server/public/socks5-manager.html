@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SOCKS5 Proxy Manager - Skull Knight</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="stylesheet" href="/assets/tailwind.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/assets/main.css" />
+    <link rel="stylesheet" href="/assets/custom.css" />
+    <script defer src="/assets/toast.js"></script>
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-slate-100">
+    <header id="top-nav"></header>
+
+    <main class="px-5 py-6 flex-1 flex flex-col">
+      <div class="flex-1 flex flex-col gap-4" style="max-width: 1100px; margin: 0 auto; width: 100%">
+        <!-- Header -->
+        <div class="flex flex-wrap gap-3 items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-3 shadow-lg">
+              <i class="fa-solid fa-network-wired text-blue-400"></i>
+              <span class="font-semibold">SOCKS5 Proxy Manager</span>
+            </div>
+          </div>
+          <button
+            id="addProxyBtn"
+            class="button primary"
+          >
+            <i class="fa-solid fa-plus"></i>
+            <span>Add Proxy</span>
+          </button>
+        </div>
+
+        <!-- Info Banner -->
+        <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+          <div class="flex items-start gap-3">
+            <i class="fa-solid fa-circle-info text-blue-400 mt-0.5"></i>
+            <div class="text-sm text-blue-200/80">
+              <p class="font-semibold text-blue-300 mb-1">Server-Hosted SOCKS5 Proxies</p>
+              <p>
+                Each entry creates a SOCKS5 proxy listener on this server. Anyone with the server address and port
+                can route traffic through the selected client's network. No authentication is required on the
+                SOCKS5 port — security is handled by only exposing ports you choose.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Proxy Table -->
+        <div class="bg-slate-900/70 border border-slate-800 rounded-lg shadow-xl overflow-hidden">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-slate-800/50 border-b border-slate-700">
+                <th class="px-4 py-3 text-left text-slate-300 font-medium">Client</th>
+                <th class="px-4 py-3 text-left text-slate-300 font-medium">Port</th>
+                <th class="px-4 py-3 text-left text-slate-300 font-medium">Status</th>
+                <th class="px-4 py-3 text-left text-slate-300 font-medium">Connections</th>
+                <th class="px-4 py-3 text-left text-slate-300 font-medium">Usage</th>
+                <th class="px-4 py-3 text-left text-slate-300 font-medium">Started</th>
+                <th class="px-4 py-3 text-right text-slate-300 font-medium">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="proxyTableBody">
+              <tr>
+                <td colspan="7" class="px-4 py-8 text-center text-slate-500">
+                  <i class="fa-solid fa-spinner fa-spin mr-2"></i>Loading...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <!-- Add Proxy Modal (hidden by default) -->
+    <div id="addProxyModal" class="fixed inset-0 z-[10001] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-900 border border-slate-700 rounded-xl shadow-2xl w-full max-w-md p-6">
+        <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-plus text-blue-400"></i>
+          Add SOCKS5 Proxy
+        </h3>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Client</label>
+            <select
+              id="modalClientSelect"
+              class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Loading clients...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2">Listen Port (on this server)</label>
+            <input
+              id="modalPortInput"
+              type="number"
+              value="1080"
+              min="1"
+              max="65535"
+              class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <p class="text-xs text-slate-400 mt-1">
+              The SOCKS5 proxy will listen on 0.0.0.0:&lt;port&gt; on this server.
+            </p>
+          </div>
+          <div class="flex gap-2 justify-end pt-2">
+            <button id="modalCancelBtn" class="button">Cancel</button>
+            <button id="modalAddBtn" class="button primary">
+              <i class="fa-solid fa-play"></i> Start Proxy
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/assets/nav.js"></script>
+    <script type="module" src="/assets/socks5-manager.js"></script>
+  </body>
+</html>

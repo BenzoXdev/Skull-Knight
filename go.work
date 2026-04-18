@@ -1,0 +1,6 @@
+go 1.26.0
+
+use (
+	./skull-knight-Client
+	./plugins/sample-go/native
+)

