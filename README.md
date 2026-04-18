@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/benzoXdev/Skull-Knight/refs/heads/main/skull-knight-server/public/assets/skull-knight.png" alt="Skull Knight Logo" width="200" />
+  <img src="https://raw.githubusercontent.com/benzoXdev/Skull-Knight/refs/heads/main/skull-knight-server/public/assets/skull-knight.png" alt="Skull Knight Logo" width="350" />
 </p>
 
 <h1 align="center">Skull Knight</h1>
