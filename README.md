@@ -91,14 +91,6 @@ Skull Knight features a robust build pipeline for generating custom agents.
 
 ---
 
-## 🤝 Community & Support
-
-Join our community for updates, support, and development discussions.
-
-[**Telegram: WindowsBatch**](https://t.me/WindowsBatch)
-
----
-
 <p align="center">
   Developed with ❤️ by <strong>benzoXdev</strong>
 </p>
